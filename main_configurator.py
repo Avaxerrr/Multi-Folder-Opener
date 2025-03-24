@@ -1,5 +1,8 @@
+# main_configurator.py
+
 import sys
 import os
+import subprocess
 import darkdetect
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                                QHBoxLayout, QPushButton, QLabel, QMessageBox,
@@ -164,16 +167,46 @@ class FolderOpenerConfigApp(QMainWindow):
 
         # Create options group
         options_group = QGroupBox("Options")
-        options_layout = QHBoxLayout(options_group)
+        options_layout = QGridLayout(options_group)
+        options_layout.setContentsMargins(20, 10, 20, 10)  # Add padding to shift content inward
 
-        # Start instantly checkbox
+        # Start instantly checkbox (left column)
         self.start_instantly_checkbox = QCheckBox("Start instantly when launched")
         self.start_instantly_checkbox.setChecked(self.start_instantly)
         self.start_instantly_checkbox.setToolTip(
             "If checked, the folder opener will automatically open all folders when launched.\n"
             "This is useful if you want to set up a shortcut to quickly open all your folders."
         )
-        options_layout.addWidget(self.start_instantly_checkbox)
+        options_layout.addWidget(self.start_instantly_checkbox, 0, 0, Qt.AlignLeft)  # Row 0, Column 0
+
+        # Auto-close executioner checkbox (right column)
+        self.start_on_boot_checkbox = QCheckBox("Start on Windows boot")
+        self.start_on_boot_checkbox.setToolTip(
+            "If checked, the executioner will automatically close after opening all folders."
+        )
+        options_layout.addWidget(self.start_on_boot_checkbox, 0, 1, Qt.AlignRight)  # Row 0, Column 1
+
+        # Start on Windows boot checkbox (left column)
+        self.auto_close_checkbox = QCheckBox("Auto-close executioner when complete")
+        self.auto_close_checkbox.setToolTip(
+            "If checked, the executioner will start automatically when Windows boots up."
+        )
+        options_layout.addWidget(self.auto_close_checkbox, 1, 0, Qt.AlignLeft)  # Row 1, Column 0
+
+        # Startup delay spin box (right column)
+        delay_layout = QHBoxLayout()
+        delay_layout.addStretch(1)  # Add stretch to push the spin box to the right
+        delay_layout.addWidget(QLabel("Startup delay:"))
+        self.boot_start_delay_spin = QDoubleSpinBox()
+        self.boot_start_delay_spin.setRange(0, 300)  # 0 to 300 seconds (5 minutes)
+        self.boot_start_delay_spin.setSingleStep(1)
+        self.boot_start_delay_spin.setValue(0)
+        self.boot_start_delay_spin.setSuffix(" seconds")
+        self.boot_start_delay_spin.setToolTip(
+            "Delay in seconds before starting the executioner on Windows boot."
+        )
+        delay_layout.addWidget(self.boot_start_delay_spin)
+        options_layout.addLayout(delay_layout, 1, 1)  # Row 1, Column 1
 
         main_layout.addWidget(options_group)
 
@@ -187,9 +220,10 @@ class FolderOpenerConfigApp(QMainWindow):
 
         # Open folders button
         self.open_button = QPushButton("Open Folders")
-
+        self.open_button.clicked.connect(self.open_folders)
         self.open_button.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
         bottom_buttons_layout.addWidget(self.open_button)
+
 
         main_layout.addLayout(bottom_buttons_layout)
 
@@ -259,6 +293,28 @@ class FolderOpenerConfigApp(QMainWindow):
 
         # Save config
         self.config_manager.save_config(self.folders, self.sleep_timers, self.start_instantly, self)
+
+    def open_folders(self):
+        """Launch the executioner application"""
+        try:
+            # Get the correct path based on execution environment
+            if getattr(sys, 'frozen', False):
+                # Packaged executable path
+                executioner_path = os.path.join(self.application_path, "folder_opener_executioner.exe")
+            else:
+                # Development environment path
+                executioner_path = os.path.join(self.application_path, "main_launcher.py")
+
+            # Launch the executioner
+            if os.path.exists(executioner_path):
+                subprocess.Popen([executioner_path] if getattr(sys, 'frozen', False)
+                                 else [sys.executable, executioner_path])
+            else:
+                raise FileNotFoundError("Executioner application not found")
+
+        except Exception as e:
+            QMessageBox.critical(self, "Error",
+                                 f"Could not launch folder opener executioner:\n{str(e)}")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
