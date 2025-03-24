@@ -1,7 +1,4 @@
-import time
-import pyautogui
-import subprocess
-from PySide6.QtWidgets import QFileDialog, QListView, QTreeView, QAbstractItemView, QMessageBox
+from PySide6.QtWidgets import QFileDialog, QListView, QTreeView, QAbstractItemView
 
 
 class FolderOperations:
@@ -88,32 +85,3 @@ class FolderOperations:
 
         return True
 
-    @staticmethod
-    def open_folders(parent_widget, folders, sleep_timers):
-        if not folders:
-            QMessageBox.warning(parent_widget, "Warning", "No folders to open. Please add folders first.")
-            return False
-
-        try:
-            # Open Windows Explorer
-            subprocess.Popen(r'explorer.exe')
-            time.sleep(sleep_timers["explorer_startup"])
-
-            # Navigate to each folder
-            for i, folder in enumerate(folders):
-                if i > 0:
-                    pyautogui.hotkey('ctrl', 't')  # Open new tab
-                    time.sleep(sleep_timers["new_tab"])
-
-                pyautogui.hotkey('ctrl', 'l')  # Focus address bar
-                time.sleep(sleep_timers["address_bar_focus"])
-                pyautogui.write(folder)
-                time.sleep(sleep_timers["after_typing"])
-                pyautogui.press('enter')
-                time.sleep(sleep_timers["after_enter"])
-
-            QMessageBox.information(parent_widget, "Success", "All folders opened successfully!")
-            return True
-        except Exception as e:
-            QMessageBox.critical(parent_widget, "Error", f"Error opening folders: {e}")
-            return False

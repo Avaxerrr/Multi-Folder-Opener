@@ -187,7 +187,7 @@ class FolderOpenerConfigApp(QMainWindow):
 
         # Open folders button
         self.open_button = QPushButton("Open Folders")
-        self.open_button.clicked.connect(self.open_folders)
+
         self.open_button.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
         bottom_buttons_layout.addWidget(self.open_button)
 
@@ -218,10 +218,6 @@ class FolderOpenerConfigApp(QMainWindow):
 
         # Store current theme state
         self.is_dark_mode = darkdetect.isDark()
-
-        # Check if we should start instantly
-        if self.start_instantly:
-            QTimer.singleShot(500, self.open_folders)
 
     def on_palette_changed(self, palette):
         """Handle palette changes from the application (from monolithic version)"""
@@ -263,16 +259,6 @@ class FolderOpenerConfigApp(QMainWindow):
 
         # Save config
         self.config_manager.save_config(self.folders, self.sleep_timers, self.start_instantly, self)
-
-    def open_folders(self):
-        # Update sleep timers from UI before opening folders
-        self.sleep_timers["explorer_startup"] = self.explorer_startup_spin.value()
-        self.sleep_timers["new_tab"] = self.new_tab_spin.value()
-        self.sleep_timers["address_bar_focus"] = self.address_bar_spin.value()
-        self.sleep_timers["after_typing"] = self.after_typing_spin.value()
-        self.sleep_timers["after_enter"] = self.after_enter_spin.value()
-
-        FolderOperations.open_folders(self, self.folders, self.sleep_timers)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
