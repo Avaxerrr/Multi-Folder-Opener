@@ -39,3 +39,10 @@ class ThemeManager:
         dark_palette.setColor(QPalette.HighlightedText, Qt.black)
 
         QApplication.setPalette(dark_palette)
+
+    @staticmethod
+    def check_theme(current_theme):
+        new_theme = "light" if not darkdetect.isDark() else "dark"
+        if new_theme != current_theme:
+            return new_theme
+        return current_theme

@@ -1,4 +1,8 @@
+import pyautogui
+from PySide6.QtCore import QThread, Signal
 from PySide6.QtWidgets import QFileDialog, QListView, QTreeView, QAbstractItemView
+import subprocess
+import time
 
 
 class FolderOperations:
@@ -85,3 +89,60 @@ class FolderOperations:
 
         return True
 
+
+class FolderOpeningThread(QThread):
+    log_signal = Signal(str)
+    progress_signal = Signal(int)
+    finished_signal = Signal(bool, str)
+
+    def __init__(self, folders, sleep_timers):
+        super().__init__()
+        self.folders = folders
+        self.sleep_timers = sleep_timers
+
+    def run(self):
+        try:
+            if not self.folders:
+                self.log_signal.emit("No folders found in config. Please add folders using the configuration tool.")
+                self.finished_signal.emit(False, "No folders to open")
+                return
+
+            self.log_signal.emit(f"Starting to open {len(self.folders)} folders...")
+
+            self.log_signal.emit("Opening Windows Explorer...")
+            subprocess.Popen(r'explorer.exe')
+            time.sleep(self.sleep_timers["explorer_startup"])
+            self.log_signal.emit(f"Waiting {self.sleep_timers['explorer_startup']}s for Explorer to start")
+
+            for i, folder in enumerate(self.folders):
+                self.progress_signal.emit(i)
+                self.log_signal.emit(f"Opening folder {i + 1}/{len(self.folders)}: {folder}")
+
+                if i > 0:
+                    self.log_signal.emit("Opening new tab (Ctrl+T)")
+                    pyautogui.hotkey('ctrl', 't')
+                    time.sleep(self.sleep_timers["new_tab"])
+                    self.log_signal.emit(f"Waiting {self.sleep_timers['new_tab']}s after new tab")
+
+                self.log_signal.emit("Focusing address bar (Ctrl+L)")
+                pyautogui.hotkey('ctrl', 'l')
+                time.sleep(self.sleep_timers["address_bar_focus"])
+                self.log_signal.emit(f"Waiting {self.sleep_timers['address_bar_focus']}s after focusing address bar")
+
+                self.log_signal.emit(f"Typing path: {folder}")
+                pyautogui.write(folder)
+                time.sleep(self.sleep_timers["after_typing"])
+                self.log_signal.emit(f"Waiting {self.sleep_timers['after_typing']}s after typing")
+
+                self.log_signal.emit("Pressing Enter")
+                pyautogui.press('enter')
+                time.sleep(self.sleep_timers["after_enter"])
+                self.log_signal.emit(f"Waiting {self.sleep_timers['after_enter']}s after pressing Enter")
+
+            self.progress_signal.emit(len(self.folders))
+            self.log_signal.emit("All folders opened successfully!")
+            self.finished_signal.emit(True, "All folders opened successfully!")
+
+        except Exception as e:
+            self.log_signal.emit(f"Error: {str(e)}")
+            self.finished_signal.emit(False, str(e))

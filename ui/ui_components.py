@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QScrollBar, QListWidget
+from PySide6.QtWidgets import QScrollBar, QListWidget, QTextEdit
 from PySide6.QtCore import Qt
 
 
@@ -79,6 +79,19 @@ class ModernListWidget(QListWidget):
         # Additional styling for the list widget (from monolithic version)
         self.setStyleSheet("""
             QListWidget {
+                border: 1px solid rgba(0, 0, 0, 0.1);
+                border-radius: 5px;
+                padding: 5px;
+            }
+        """)
+
+class ModernTextEdit(QTextEdit):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setVerticalScrollBar(ModernScrollBar(Qt.Vertical, self))
+        self.setHorizontalScrollBar(ModernScrollBar(Qt.Horizontal, self))
+        self.setStyleSheet("""
+            QTextEdit {
                 border: 1px solid rgba(0, 0, 0, 0.1);
                 border-radius: 5px;
                 padding: 5px;
