@@ -1,15 +1,14 @@
 import sys
 import os
 from datetime import datetime
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QProgressBar, QPushButton
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QFont
 
-from ui.ui_components import ModernTextEdit
+from ui.ui_components import ModernTextEdit, ModernProgressBar, ModernButton
 from managers.config_manager import ConfigManager
 from managers.theme_manager import ThemeManager
 from core.folder_operations import FolderOpeningThread
-
 
 class FolderOpenerExecutionApp(QMainWindow):
     def __init__(self):
@@ -70,47 +69,10 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.log_text.setReadOnly(True)
         main_layout.addWidget(self.log_text)
 
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setStyleSheet("""
-            QProgressBar {
-                border: none;
-                border-radius: 5px;
-                text-align: center;
-                background-color: rgba(0, 0, 0, 0.1);
-                height: 20px;
-            }
-
-            QProgressBar::chunk {
-                background-color: #4CAF50;
-                border-radius: 5px;
-            }
-        """)
+        self.progress_bar = ModernProgressBar()
         main_layout.addWidget(self.progress_bar)
 
-        self.execute_button = QPushButton("Execute Folder Opening")
-        self.execute_button.setStyleSheet("""
-            QPushButton {
-                background-color: #4CAF50;
-                color: white;
-                font-weight: bold;
-                border: none;
-                border-radius: 5px;
-                padding: 8px;
-            }
-
-            QPushButton:hover {
-                background-color: #45a049;
-            }
-
-            QPushButton:pressed {
-                background-color: #3d8b40;
-            }
-
-            QPushButton:disabled {
-                background-color: #cccccc;
-                color: #666666;
-            }
-        """)
+        self.execute_button = ModernButton("Execute Folder Opening")
         self.execute_button.clicked.connect(self.execute_folder_opening)
         main_layout.addWidget(self.execute_button)
 

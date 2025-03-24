@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QScrollBar, QListWidget, QTextEdit
+from PySide6.QtWidgets import QScrollBar, QListWidget, QTextEdit, QPushButton, QProgressBar
 from PySide6.QtCore import Qt
 
 
@@ -95,5 +95,50 @@ class ModernTextEdit(QTextEdit):
                 border: 1px solid rgba(0, 0, 0, 0.1);
                 border-radius: 5px;
                 padding: 5px;
+            }
+        """)
+
+class ModernProgressBar(QProgressBar):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet("""
+            QProgressBar {
+                border: none;
+                border-radius: 5px;
+                text-align: center;
+                background-color: rgba(0, 0, 0, 0.1);
+                height: 20px;
+            }
+
+            QProgressBar::chunk {
+                background-color: #4CAF50;
+                border-radius: 5px;
+            }
+        """)
+
+class ModernButton(QPushButton):
+    def __init__(self, text, parent=None):
+        super().__init__(text, parent)
+        self.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                font-weight: bold;
+                border: none;
+                border-radius: 5px;
+                padding: 8px;
+            }
+
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+
+            QPushButton:pressed {
+                background-color: #3d8b40;
+            }
+
+            QPushButton:disabled {
+                background-color: #cccccc;
+                color: #666666;
             }
         """)
