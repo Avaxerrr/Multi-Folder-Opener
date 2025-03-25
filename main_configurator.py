@@ -34,7 +34,8 @@ class FolderOpenerConfigApp(QMainWindow):
         self.config_manager = ConfigManager(self.config_path)
 
         # Initialize folders list and sleep timers
-        self.folders, self.sleep_timers, self.start_instantly = self.config_manager.load_config(self)
+        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay = self.config_manager.load_config(
+            self)
 
         # Setup UI
         self.setWindowTitle("Folder Opener Configuration")
@@ -186,12 +187,34 @@ class FolderOpenerConfigApp(QMainWindow):
         )
         options_layout.addWidget(self.start_on_boot_checkbox, 0, 1, Qt.AlignRight)  # Row 0, Column 1
 
-        # Start on Windows boot checkbox (left column)
+        # Auto-close executioner checkbox (left column)
         self.auto_close_checkbox = QCheckBox("Auto-close executioner when complete")
+        self.auto_close_checkbox.setChecked(self.auto_close if hasattr(self, 'auto_close') else False)
         self.auto_close_checkbox.setToolTip(
-            "If checked, the executioner will start automatically when Windows boots up."
+            "If checked, the executioner will automatically close after opening all folders."
         )
         options_layout.addWidget(self.auto_close_checkbox, 1, 0, Qt.AlignLeft)  # Row 1, Column 0
+
+        # Auto-close delay layout (left column, below checkbox)
+        auto_close_delay_layout = QHBoxLayout()
+        auto_close_delay_layout.addWidget(QLabel("Close delay:"))
+        self.auto_close_delay_spin = QDoubleSpinBox()
+        self.auto_close_delay_spin.setRange(0.5, 10.0)  # 0.5 to 10 seconds
+        self.auto_close_delay_spin.setSingleStep(0.5)
+        self.auto_close_delay_spin.setValue(self.auto_close_delay if hasattr(self, 'auto_close_delay') else 1.5)
+        self.auto_close_delay_spin.setSuffix(" seconds")
+        self.auto_close_delay_spin.setToolTip(
+            "Delay in seconds before closing the executioner after completing folder opening."
+        )
+        self.auto_close_delay_spin.setEnabled(self.auto_close_checkbox.isChecked())
+        auto_close_delay_layout.addWidget(self.auto_close_delay_spin)
+        auto_close_delay_layout.addStretch(1)  # Add stretch to prevent the layout from expanding too much
+        options_layout.addLayout(auto_close_delay_layout, 2, 0)  # Row 2, Column 0
+
+        # Connect checkbox state to spinbox enabled state
+        self.auto_close_checkbox.stateChanged.connect(
+            lambda state: self.auto_close_delay_spin.setEnabled(state == Qt.Checked)
+        )
 
         # Startup delay spin box (right column)
         delay_layout = QHBoxLayout()
@@ -224,10 +247,8 @@ class FolderOpenerConfigApp(QMainWindow):
         self.open_button.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
         bottom_buttons_layout.addWidget(self.open_button)
 
-
         main_layout.addLayout(bottom_buttons_layout)
 
-        # Add author label (from monolithic version)
         author_label = QLabel("Created by Avaxerrr")
         author_label.setAlignment(Qt.AlignRight)
         font = QFont()
@@ -291,8 +312,19 @@ class FolderOpenerConfigApp(QMainWindow):
         # Update start instantly option
         self.start_instantly = self.start_instantly_checkbox.isChecked()
 
+        # Update auto close option and delay
+        self.auto_close = self.auto_close_checkbox.isChecked()
+        self.auto_close_delay = self.auto_close_delay_spin.value()
+
         # Save config
-        self.config_manager.save_config(self.folders, self.sleep_timers, self.start_instantly, self)
+        self.config_manager.save_config(
+            self.folders,
+            self.sleep_timers,
+            self.start_instantly,
+            self,
+            auto_close=self.auto_close,
+            auto_close_delay=self.auto_close_delay
+        )
 
     def open_folders(self):
         """Launch the executioner application"""
@@ -315,6 +347,7 @@ class FolderOpenerConfigApp(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error",
                                  f"Could not launch folder opener executioner:\n{str(e)}")
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

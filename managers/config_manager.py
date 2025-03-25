@@ -18,6 +18,8 @@ class ConfigManager:
             "after_enter": 0.3
         }
         start_instantly = False
+        auto_close = False
+        auto_close_delay = 1.5
 
         # Check if config file exists, if not create a default one
         if not os.path.exists(self.config_path):
@@ -27,7 +29,9 @@ class ConfigManager:
                     "Add you folder locations here..."
                 ],
                 "sleep_timers": sleep_timers,
-                "start_instantly": False
+                "start_instantly": False,
+                "auto_close": False,
+                "auto_close_delay": 1.5
             }
 
             try:
@@ -36,10 +40,12 @@ class ConfigManager:
                 folders = default_config['folders']
                 sleep_timers = default_config['sleep_timers']
                 start_instantly = default_config['start_instantly']
+                auto_close = default_config['auto_close']
+                auto_close_delay = default_config['auto_close_delay']
             except Exception as e:
                 if parent_widget:
                     QMessageBox.critical(parent_widget, "Error", f"Error creating config file: {e}")
-                return folders, sleep_timers, start_instantly
+                return folders, sleep_timers, start_instantly, auto_close, auto_close_delay
 
         # Read config from file
         try:
@@ -59,18 +65,27 @@ class ConfigManager:
                 # Load start_instantly setting if it exists
                 start_instantly = config.get('start_instantly', False)
 
+                # Load auto_close setting if it exists
+                auto_close = config.get('auto_close', False)
+
+                # Load auto_close_delay setting if it exists
+                auto_close_delay = config.get('auto_close_delay', 1.5)
+
         except Exception as e:
             if parent_widget:
                 QMessageBox.critical(parent_widget, "Error", f"Error loading config: {e}")
 
-        return folders, sleep_timers, start_instantly
+        return folders, sleep_timers, start_instantly, auto_close, auto_close_delay
 
-    def save_config(self, folders, sleep_timers, start_instantly, parent_widget=None):
+    def save_config(self, folders, sleep_timers, start_instantly, parent_widget=None, auto_close=False,
+                    auto_close_delay=1.5):
         try:
             config = {
                 "folders": folders,
                 "sleep_timers": sleep_timers,
-                "start_instantly": start_instantly
+                "start_instantly": start_instantly,
+                "auto_close": auto_close,
+                "auto_close_delay": auto_close_delay
             }
 
             with open(self.config_path, 'w') as f:

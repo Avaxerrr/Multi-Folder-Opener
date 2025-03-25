@@ -23,7 +23,7 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.config_path = os.path.join(self.application_path, 'folders_config.json')
 
         self.config_manager = ConfigManager(self.config_path)
-        self.folders, self.sleep_timers, self.start_instantly = self.config_manager.load_config(self)
+        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay = self.config_manager.load_config(self)
 
         self.setup_ui()
 
@@ -147,6 +147,11 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.execute_button.setEnabled(True)
         if success:
             self.log("Folder opening process completed successfully.")
+            # Check if auto-close is enabled and close the application if it is
+            if self.auto_close:
+                delay_ms = int(self.auto_close_delay * 1000)  # Convert seconds to milliseconds
+                self.log(f"Auto-close enabled. Closing application in {self.auto_close_delay} seconds...")
+                QTimer.singleShot(delay_ms, self.close)
         else:
             self.log(f"Folder opening process failed: {message}")
 
