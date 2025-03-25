@@ -15,6 +15,7 @@ from ui.ui_components import ModernListWidget
 from managers.theme_manager import ThemeManager
 from managers.config_manager import ConfigManager
 from core.folder_operations import FolderOperations
+from managers.startup_manager import StartupManager
 
 
 class FolderOpenerConfigApp(QMainWindow):
@@ -180,11 +181,13 @@ class FolderOpenerConfigApp(QMainWindow):
         )
         options_layout.addWidget(self.start_instantly_checkbox, 0, 0, Qt.AlignLeft)  # Row 0, Column 0
 
-        # Auto-close executioner checkbox (right column)
+        # Start on Windows boot checkbox (right column)
         self.start_on_boot_checkbox = QCheckBox("Start on Windows boot")
         self.start_on_boot_checkbox.setToolTip(
-            "If checked, the executioner will automatically close after opening all folders."
+            "If checked, the folder opener will automatically start when Windows starts."
         )
+        # Check if startup shortcut exists and set checkbox accordingly
+        self.start_on_boot_checkbox.setChecked(StartupManager.check_startup_shortcut_exists())
         options_layout.addWidget(self.start_on_boot_checkbox, 0, 1, Qt.AlignRight)  # Row 0, Column 1
 
         # Auto-close executioner checkbox (left column)
@@ -210,7 +213,9 @@ class FolderOpenerConfigApp(QMainWindow):
         auto_close_delay_layout.addStretch(1)  # Add stretch to prevent the layout from expanding too much
         options_layout.addLayout(auto_close_delay_layout, 2, 0)  # Row 2, Column 0
 
-        # Startup delay spin box (right column)
+
+        # Startup delay spin box (right column) - COMMENTED OUT BUT KEPT FOR FUTURE USE
+        """
         delay_layout = QHBoxLayout()
         delay_layout.addStretch(1)  # Add stretch to push the spin box to the right
         delay_layout.addWidget(QLabel("Startup delay:"))
@@ -224,6 +229,7 @@ class FolderOpenerConfigApp(QMainWindow):
         )
         delay_layout.addWidget(self.boot_start_delay_spin)
         options_layout.addLayout(delay_layout, 1, 1)  # Row 1, Column 1
+        """
 
         main_layout.addWidget(options_group)
 
@@ -309,6 +315,18 @@ class FolderOpenerConfigApp(QMainWindow):
         # Update auto close option and delay
         self.auto_close = self.auto_close_checkbox.isChecked()
         self.auto_close_delay = self.auto_close_delay_spin.value()
+
+        # Handle startup on boot setting
+        start_on_boot = self.start_on_boot_checkbox.isChecked()
+        current_startup_status = StartupManager.check_startup_shortcut_exists()
+
+        # Create or remove startup shortcut if needed
+        if start_on_boot and not current_startup_status:
+            if not StartupManager.create_startup_shortcut(self.application_path, self):
+                self.start_on_boot_checkbox.setChecked(False)
+        elif not start_on_boot and current_startup_status:
+            if not StartupManager.remove_startup_shortcut(self):
+                self.start_on_boot_checkbox.setChecked(True)
 
         # Save config
         self.config_manager.save_config(

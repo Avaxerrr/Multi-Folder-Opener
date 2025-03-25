@@ -66,6 +66,19 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.header_label.setContentsMargins(0, 0, 0, 10)
         main_layout.addWidget(self.header_label)
 
+        # Add warning label
+        self.warning_label = QLabel("⚠️ WARNING: Please do not interact with your computer during folder opening process!")
+        self.warning_label.setStyleSheet(
+            "color: #721c24;"
+            "background-color: #f8d7da;"
+            "border: 1px solid #f5c6cb;"
+            "border-radius: 4px;"
+            "padding: 8px;"
+            "font-weight: bold;"
+        )
+        self.warning_label.setAlignment(Qt.AlignCenter)
+        main_layout.addWidget(self.warning_label)
+
         self.log_text = ModernTextEdit()
         self.log_text.setReadOnly(True)
         main_layout.addWidget(self.log_text)
