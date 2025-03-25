@@ -199,22 +199,16 @@ class FolderOpenerConfigApp(QMainWindow):
         auto_close_delay_layout = QHBoxLayout()
         auto_close_delay_layout.addWidget(QLabel("Close delay:"))
         self.auto_close_delay_spin = QDoubleSpinBox()
-        self.auto_close_delay_spin.setRange(0.5, 10.0)  # 0.5 to 10 seconds
-        self.auto_close_delay_spin.setSingleStep(0.5)
+        self.auto_close_delay_spin.setRange(0.1, 10.0)  # 0.5 to 10 seconds
+        self.auto_close_delay_spin.setSingleStep(0.1)
         self.auto_close_delay_spin.setValue(self.auto_close_delay if hasattr(self, 'auto_close_delay') else 1.5)
         self.auto_close_delay_spin.setSuffix(" seconds")
         self.auto_close_delay_spin.setToolTip(
             "Delay in seconds before closing the executioner after completing folder opening."
         )
-        self.auto_close_delay_spin.setEnabled(self.auto_close_checkbox.isChecked())
         auto_close_delay_layout.addWidget(self.auto_close_delay_spin)
         auto_close_delay_layout.addStretch(1)  # Add stretch to prevent the layout from expanding too much
         options_layout.addLayout(auto_close_delay_layout, 2, 0)  # Row 2, Column 0
-
-        # Connect checkbox state to spinbox enabled state
-        self.auto_close_checkbox.stateChanged.connect(
-            lambda state: self.auto_close_delay_spin.setEnabled(state == Qt.Checked)
-        )
 
         # Startup delay spin box (right column)
         delay_layout = QHBoxLayout()
