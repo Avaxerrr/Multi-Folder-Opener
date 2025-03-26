@@ -46,7 +46,7 @@ class StartupManager:
                 if not os.path.exists(target_path):
                     if parent_widget:
                         QMessageBox.warning(parent_widget, "Warning",
-                                            "Could not find the launcher script. Startup on boot may not work.")
+                                            "Could not find the launcher. Startup on boot may not work.")
                     return False
 
             # Create shortcut object
@@ -67,7 +67,7 @@ class StartupManager:
                 shortcut.Arguments = f'"{target_path}"'
                 shortcut.WorkingDirectory = application_path
 
-            shortcut.IconLocation = os.path.join(application_path, 'icons', 'folder_automator.ico')
+            shortcut.IconLocation = os.path.join(application_path, 'icons', 'launcher.ico')
             shortcut.Description = "Folder Opener Launcher"
             shortcut.save()
 
