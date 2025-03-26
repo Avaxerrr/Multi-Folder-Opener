@@ -38,7 +38,7 @@ class StartupManager:
             # Get the path to the executable or script
             if getattr(sys, 'frozen', False):
                 # Running as executable
-                target_path = os.path.join(application_path, "folder_opener_executioner.exe") # need to change for the final executable name
+                target_path = os.path.join(application_path, "launcher.exe") # need to change for the final executable name
             else:
                 # Running as script
                 target_path = os.path.join(application_path, "main_launcher.py")
