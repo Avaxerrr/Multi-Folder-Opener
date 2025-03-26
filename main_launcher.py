@@ -1,3 +1,5 @@
+# main_launcher.py
+
 import sys
 import os
 import subprocess
@@ -49,7 +51,7 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.setWindowTitle("Multi Folder Opener Launcher")
         self.setMinimumSize(600, 400)
 
-        icon_path = os.path.join(self.application_path, 'icons', 'folder_automator.ico')
+        icon_path = os.path.join(self.application_path, 'icons', 'launcher.ico')
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
             QApplication.instance().setWindowIcon(QIcon(icon_path))

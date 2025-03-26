@@ -1,4 +1,4 @@
-# main_configurator.py
+#  main_configurator.py
 
 import sys
 import os

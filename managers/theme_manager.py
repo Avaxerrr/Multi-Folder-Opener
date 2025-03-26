@@ -1,3 +1,5 @@
+# theme_manager.py
+
 import darkdetect
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QPalette, QColor, Qt

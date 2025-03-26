@@ -1,5 +1,5 @@
 # about_dialog.py
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QFrame
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QFont, QDesktopServices
 
@@ -8,7 +8,7 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("About Multi Folder Opener")
-        self.setFixedSize(450, 350)
+        self.setFixedSize(450, 500)
 
         # Main layout
         layout = QVBoxLayout()
@@ -27,14 +27,14 @@ class AboutDialog(QDialog):
         version_label = QLabel("Version 1.0.0")
         version_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(version_label)
+        layout.addSpacing(10)
 
         # Description
         description = (
-            "Folder Opener is a utility designed to streamline your workflow by "
-            "opening multiple folders simultaneously in Windows Explorer. "
-            "Configure your frequently accessed folders and launch them with a single click, "
-            "saving time and reducing repetitive tasks. Perfect for developers, designers, "
-            "and anyone who regularly works with multiple project directories."
+            "Multi Folder Opener is a Windows utility that streamlines your workflow by "
+            "opening multiple folders simultaneously in Windows Explorer tabs. "
+            "It uses automation to navigate Explorer and open each configured folder in a new tab, "
+            "saving you time and reducing repetitive tasks."
         )
         desc_label = QLabel(description)
         desc_label.setWordWrap(True)
@@ -42,21 +42,62 @@ class AboutDialog(QDialog):
         layout.addWidget(desc_label)
         layout.addSpacing(10)
 
+        # Features
+        features_label = QLabel("Key Features:")
+        features_label.setFont(QFont("", weight=QFont.Bold))
+        layout.addWidget(features_label)
+
+        features = QLabel(
+            "• Opens multiple folders in Windows Explorer tabs with a single click\n"
+            "• Configurable delay settings to accommodate different system speeds\n"
+            "• Editable folder paths reordering\n"
+            "• Auto-start and auto-close options for automated workflows\n"
+            "• Supports both light and dark themes to match your Windows settings"
+        )
+        features.setWordWrap(True)
+        layout.addWidget(features)
+        layout.addSpacing(15)
+
+        # Separator line
+        separator = QFrame()
+        separator.setFrameShape(QFrame.HLine)
+        separator.setFrameShadow(QFrame.Sunken)
+        layout.addWidget(separator)
+
         # Author
         author_label = QLabel("Created by Avaxerrr")
         author_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(author_label)
 
         # GitHub link
-        github_link = QLabel("<a href='https://github.com/yourusername/folder-opener'>GitHub Repository</a>")
+        github_link = QLabel("<a href='https://github.com/Avaxerrr/Multi-Folder-Opener.git'>GitHub Repository</a>")
         github_link.setOpenExternalLinks(True)
         github_link.setAlignment(Qt.AlignCenter)
         layout.addWidget(github_link)
 
         # License
-        license_label = QLabel("Licensed under MIT License")
+        license_label = QLabel("Copyright © 2025 Avaxerrr. Licensed under the MIT License.")
         license_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(license_label)
+        layout.addSpacing(10)
+
+        # Icon Credits
+        credits_label = QLabel("Icon Credits:")
+        credits_label.setFont(QFont("", weight=QFont.Bold))
+        credits_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(credits_label)
+
+        launcher_credit = QLabel(
+            "Launcher icon created by <a href='https://www.flaticon.com/authors/3d/color/'>3D Color</a> from <a href='https://www.flaticon.com/'>Flaticon</a>")
+        launcher_credit.setOpenExternalLinks(True)
+        launcher_credit.setAlignment(Qt.AlignCenter)
+        layout.addWidget(launcher_credit)
+
+        configurator_credit = QLabel(
+            "Configurator icon created by <a href='https://www.flaticon.com/authors/basic-rounded/flat'>Basic Round Flat</a> from <a href='https://www.flaticon.com/'>Flaticon</a>")
+        configurator_credit.setOpenExternalLinks(True)
+        configurator_credit.setAlignment(Qt.AlignCenter)
+        layout.addWidget(configurator_credit)
 
         layout.addStretch()
 

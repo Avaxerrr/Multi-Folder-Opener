@@ -1,3 +1,5 @@
+# ui_components.py
+
 from PySide6.QtWidgets import QScrollBar, QListWidget, QTextEdit, QPushButton, QProgressBar, QAbstractItemView
 from PySide6.QtCore import Qt
 

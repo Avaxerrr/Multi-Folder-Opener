@@ -1,4 +1,4 @@
-# startup_manager.py
+#  startup_manager.py
 
 import os
 import sys

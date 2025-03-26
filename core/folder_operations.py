@@ -1,3 +1,5 @@
+# folder_operations.py
+
 import os
 
 import pyautogui
