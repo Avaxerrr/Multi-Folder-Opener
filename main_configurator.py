@@ -213,24 +213,6 @@ class FolderOpenerConfigApp(QMainWindow):
         auto_close_delay_layout.addStretch(1)  # Add stretch to prevent the layout from expanding too much
         options_layout.addLayout(auto_close_delay_layout, 2, 0)  # Row 2, Column 0
 
-
-        # Startup delay spin box (right column) - COMMENTED OUT BUT KEPT FOR FUTURE USE
-        """
-        delay_layout = QHBoxLayout()
-        delay_layout.addStretch(1)  # Add stretch to push the spin box to the right
-        delay_layout.addWidget(QLabel("Startup delay:"))
-        self.boot_start_delay_spin = QDoubleSpinBox()
-        self.boot_start_delay_spin.setRange(0, 300)  # 0 to 300 seconds (5 minutes)
-        self.boot_start_delay_spin.setSingleStep(1)
-        self.boot_start_delay_spin.setValue(0)
-        self.boot_start_delay_spin.setSuffix(" seconds")
-        self.boot_start_delay_spin.setToolTip(
-            "Delay in seconds before starting the executioner on Windows boot."
-        )
-        delay_layout.addWidget(self.boot_start_delay_spin)
-        options_layout.addLayout(delay_layout, 1, 1)  # Row 1, Column 1
-        """
-
         main_layout.addWidget(options_group)
 
         # Create bottom buttons layout

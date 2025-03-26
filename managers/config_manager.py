@@ -25,7 +25,7 @@ class ConfigManager:
         if not os.path.exists(self.config_path):
             default_config = {
                 "folders": [
-                    "C:\\Users\\Work\\Desktop",
+                    "C:\\Users\Work\Desktop",
                     "Add you folder locations here..."
                 ],
                 "sleep_timers": sleep_timers,
@@ -80,8 +80,11 @@ class ConfigManager:
     def save_config(self, folders, sleep_timers, start_instantly, parent_widget=None, auto_close=False,
                     auto_close_delay=1.5):
         try:
+            # Normalize all folder paths to Windows format
+            normalized_folders = [os.path.normpath(folder) for folder in folders]
+
             config = {
-                "folders": folders,
+                "folders": normalized_folders,
                 "sleep_timers": sleep_timers,
                 "start_instantly": start_instantly,
                 "auto_close": auto_close,

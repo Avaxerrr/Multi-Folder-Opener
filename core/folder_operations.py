@@ -1,3 +1,5 @@
+import os
+
 import pyautogui
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtWidgets import QFileDialog, QListView, QTreeView, QAbstractItemView
@@ -22,20 +24,20 @@ class FolderOperations:
         list_view = dialog.findChild(QListView, "listView")
         if list_view:
             list_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
-            # Set selection behavior to require Ctrl/Shift for multiple selection
             list_view.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         tree_view = dialog.findChild(QTreeView)
         if tree_view:
             tree_view.setSelectionMode(QAbstractItemView.ExtendedSelection)
-            # Set selection behavior to require Ctrl/Shift for multiple selection
             tree_view.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         if dialog.exec():
             selected_folders = dialog.selectedFiles()
             for folder in selected_folders:
-                if folder not in folders:
-                    folders.append(folder)
+                # Normalize path to Windows format
+                normalized_folder = os.path.normpath(folder)
+                if normalized_folder not in folders:
+                    folders.append(normalized_folder)
             return True
         return False
 
