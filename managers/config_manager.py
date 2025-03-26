@@ -25,7 +25,7 @@ class ConfigManager:
         if not os.path.exists(self.config_path):
             default_config = {
                 "folders": [
-                    "C:\\Users\Work\Desktop",
+                    "C:\\Users\\Work\\Desktop",
                     "Add you folder locations here..."
                 ],
                 "sleep_timers": sleep_timers,
@@ -52,6 +52,9 @@ class ConfigManager:
             with open(self.config_path, 'r') as f:
                 config = json.load(f)
                 folders = config.get('folders', [])
+
+                # Normalize paths to Windows format
+                folders = [os.path.normpath(folder) for folder in folders]
 
                 # Load sleep timers if they exist, otherwise use defaults
                 if 'sleep_timers' in config:

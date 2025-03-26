@@ -1,8 +1,8 @@
 import os
 
 import pyautogui
-from PySide6.QtCore import QThread, Signal
-from PySide6.QtWidgets import QFileDialog, QListView, QTreeView, QAbstractItemView
+from PySide6.QtCore import QThread, Signal, Qt
+from PySide6.QtWidgets import QFileDialog, QListView, QTreeView, QAbstractItemView, QMessageBox, QListWidgetItem
 import subprocess
 import time
 
@@ -12,7 +12,9 @@ class FolderOperations:
     def update_folders_list(folders_list_widget, folders):
         folders_list_widget.clear()
         for folder in folders:
-            folders_list_widget.addItem(folder)
+            item = QListWidgetItem(folder)
+            item.setFlags(item.flags() | Qt.ItemIsEditable)  # Make item editable
+            folders_list_widget.addItem(item)
 
     @staticmethod
     def add_folders(parent_widget, folders):
@@ -89,6 +91,32 @@ class FolderOperations:
                 # Select the item
                 folders_list_widget.item(index + 1).setSelected(True)
 
+        return True
+
+    @staticmethod
+    def edit_folder_path(item, folders_list_widget, folders):
+        """Handle editing of folder paths"""
+        index = folders_list_widget.row(item)
+        new_path = os.path.normpath(item.text())
+
+        # Validate if the path exists
+        if not os.path.exists(new_path):
+            # Path doesn't exist, ask user if they want to keep it anyway
+            result = QMessageBox.question(
+                folders_list_widget.parent(),
+                "Path Validation",
+                f"The path '{new_path}' doesn't exist. Keep it anyway?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
+
+            if result == QMessageBox.No:
+                # Revert to original path
+                item.setText(folders[index])
+                return False
+
+        # Update the path in the folders list
+        folders[index] = new_path
         return True
 
 

@@ -6,7 +6,7 @@ import subprocess
 import darkdetect
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                                QHBoxLayout, QPushButton, QLabel, QMessageBox,
-                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox)
+                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox, QMenu, QListWidgetItem)
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QFont
 
@@ -16,6 +16,7 @@ from managers.theme_manager import ThemeManager
 from managers.config_manager import ConfigManager
 from core.folder_operations import FolderOperations
 from managers.startup_manager import StartupManager
+from ui.about_dialog import AboutDialog
 
 
 class FolderOpenerConfigApp(QMainWindow):
@@ -39,7 +40,7 @@ class FolderOpenerConfigApp(QMainWindow):
             self)
 
         # Setup UI
-        self.setWindowTitle("Folder Opener Configuration")
+        self.setWindowTitle("Multi Folder Opener Configurator")
         self.setMinimumSize(700, 500)
 
         # Set application icon
@@ -56,14 +57,22 @@ class FolderOpenerConfigApp(QMainWindow):
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(10)
 
-        # Create header label - without hardcoded color styling
-        self.header_label = QLabel("Folder Opener Configuration")
+        # Header label
+        self.header_label = QLabel("Configure Folders and Launch Settings")
         font = QFont()
         font.setPointSize(12)
         font.setBold(True)
         self.header_label.setFont(font)
         self.header_label.setContentsMargins(0, 0, 0, 10)
         main_layout.addWidget(self.header_label)
+
+        # Subheader/description for delay settings
+        self.delay_description = QLabel(
+            "Adjust delay settings based on your system performance. "
+            "Longer delays help ensure folders open properly without errors on slower systems.")
+        self.delay_description.setWordWrap(True)
+        self.delay_description.setContentsMargins(0, 0, 0, 10)
+        main_layout.addWidget(self.delay_description)
 
         # Create folders group
         folders_group = QGroupBox("Folders to Open")
@@ -74,6 +83,11 @@ class FolderOpenerConfigApp(QMainWindow):
         self.folders_list.setSelectionMode(ModernListWidget.SelectionMode.ExtendedSelection)
         FolderOperations.update_folders_list(self.folders_list, self.folders)
         folders_layout.addWidget(self.folders_list)
+
+        # editable view list
+        self.folders_list.itemChanged.connect(self.on_folder_edited)
+        self.folders_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.folders_list.customContextMenuRequested.connect(self.show_folder_context_menu)
 
         # Create folder buttons layout
         folder_buttons_layout = QHBoxLayout()
@@ -168,7 +182,7 @@ class FolderOpenerConfigApp(QMainWindow):
         main_layout.addWidget(timing_group)
 
         # Create options group
-        options_group = QGroupBox("Options")
+        options_group = QGroupBox("Launch Options")
         options_layout = QGridLayout(options_group)
         options_layout.setContentsMargins(20, 10, 20, 10)  # Add padding to shift content inward
 
@@ -191,7 +205,7 @@ class FolderOpenerConfigApp(QMainWindow):
         options_layout.addWidget(self.start_on_boot_checkbox, 0, 1, Qt.AlignRight)  # Row 0, Column 1
 
         # Auto-close executioner checkbox (left column)
-        self.auto_close_checkbox = QCheckBox("Auto-close executioner when complete")
+        self.auto_close_checkbox = QCheckBox("Auto-close the launcher when complete")
         self.auto_close_checkbox.setChecked(self.auto_close if hasattr(self, 'auto_close') else False)
         self.auto_close_checkbox.setToolTip(
             "If checked, the executioner will automatically close after opening all folders."
@@ -210,7 +224,7 @@ class FolderOpenerConfigApp(QMainWindow):
             "Delay in seconds before closing the executioner after completing folder opening."
         )
         auto_close_delay_layout.addWidget(self.auto_close_delay_spin)
-        auto_close_delay_layout.addStretch(1)  # Add stretch to prevent the layout from expanding too much
+        auto_close_delay_layout.addStretch(1)
         options_layout.addLayout(auto_close_delay_layout, 2, 0)  # Row 2, Column 0
 
         main_layout.addWidget(options_group)
@@ -224,19 +238,22 @@ class FolderOpenerConfigApp(QMainWindow):
         bottom_buttons_layout.addWidget(self.save_button)
 
         # Open folders button
-        self.open_button = QPushButton("Open Folders")
+        self.open_button = QPushButton("Start Launcher")
         self.open_button.clicked.connect(self.open_folders)
         self.open_button.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
         bottom_buttons_layout.addWidget(self.open_button)
 
         main_layout.addLayout(bottom_buttons_layout)
 
-        author_label = QLabel("Created by Avaxerrr")
-        author_label.setAlignment(Qt.AlignRight)
+        self.author_label = QLabel("Created by Avaxerrr")
+        self.author_label.setStyleSheet("color: palette(text); text-decoration: underline; cursor: pointer;")
+        self.author_label.setCursor(Qt.PointingHandCursor)
+        self.author_label.mousePressEvent = self.show_about_dialog
+        self.author_label.setAlignment(Qt.AlignRight)
+        main_layout.addWidget(self.author_label)
         font = QFont()
         font.setItalic(True)
-        author_label.setFont(font)
-        main_layout.addWidget(author_label)
+        self.author_label.setFont(font)
 
         # Set central widget
         self.setCentralWidget(central_widget)
@@ -321,26 +338,76 @@ class FolderOpenerConfigApp(QMainWindow):
         )
 
     def open_folders(self):
-        """Launch the executioner application"""
+        """Open the launcher application"""
         try:
             # Get the correct path based on execution environment
             if getattr(sys, 'frozen', False):
                 # Packaged executable path
-                executioner_path = os.path.join(self.application_path, "folder_opener_executioner.exe")
+                launcher_path = os.path.join(self.application_path, "launcher.exe")
             else:
                 # Development environment path
-                executioner_path = os.path.join(self.application_path, "main_launcher.py")
+                launcher_path = os.path.join(self.application_path, "main_launcher.py")
 
             # Launch the executioner
-            if os.path.exists(executioner_path):
-                subprocess.Popen([executioner_path] if getattr(sys, 'frozen', False)
-                                 else [sys.executable, executioner_path])
+            if os.path.exists(launcher_path):
+                subprocess.Popen([launcher_path] if getattr(sys, 'frozen', False)
+                                 else [sys.executable, launcher_path])
             else:
-                raise FileNotFoundError("Executioner application not found")
+                raise FileNotFoundError("Launcher not found")
 
         except Exception as e:
             QMessageBox.critical(self, "Error",
-                                 f"Could not launch folder opener executioner:\n{str(e)}")
+                                 f"Could not open the launcher:\n{str(e)}")
+
+    # Add these methods to your FolderOpenerConfigApp class:
+    def on_folder_edited(self, item):
+        """Handle when a folder path is edited in the list"""
+        FolderOperations.edit_folder_path(item, self.folders_list, self.folders)
+
+    def show_folder_context_menu(self, position):
+        """Show context menu for folder items"""
+        item = self.folders_list.itemAt(position)
+        if not item:
+            return
+
+        context_menu = QMenu(self)
+
+        # Add actions
+        edit_action = context_menu.addAction("Edit Path")
+        explore_action = context_menu.addAction("Open in Explorer")
+        remove_action = context_menu.addAction("Remove")
+
+        # Show the menu and get the selected action
+        action = context_menu.exec(self.folders_list.mapToGlobal(position))
+
+        # Handle the selected action
+        if action == edit_action:
+            self.folders_list.editItem(item)
+        elif action == explore_action:
+            try:
+                folder_path = item.text()
+                if os.path.exists(folder_path):
+                    # Open the folder in Explorer
+                    subprocess.Popen(f'explorer "{folder_path}"')
+                else:
+                    QMessageBox.warning(self, "Warning", f"The path '{folder_path}' doesn't exist.")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Could not open folder: {str(e)}")
+        elif action == remove_action:
+            index = self.folders_list.row(item)
+            self.folders.pop(index)
+            self.folders_list.takeItem(index)
+
+    def update_folders_list(self):
+        self.folders_list.clear()
+        for folder in self.folders:
+            item = QListWidgetItem(folder)
+            item.setFlags(item.flags() | Qt.ItemIsEditable)
+            self.folders_list.addItem(item)
+
+    def show_about_dialog(self, event):
+        dialog = AboutDialog(self)
+        dialog.exec()
 
 
 if __name__ == "__main__":

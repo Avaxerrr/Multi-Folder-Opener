@@ -1,6 +1,5 @@
-from PySide6.QtWidgets import QScrollBar, QListWidget, QTextEdit, QPushButton, QProgressBar
+from PySide6.QtWidgets import QScrollBar, QListWidget, QTextEdit, QPushButton, QProgressBar, QAbstractItemView
 from PySide6.QtCore import Qt
-
 
 class ModernScrollBar(QScrollBar):
     def __init__(self, orientation=Qt.Vertical, parent=None):
@@ -76,6 +75,10 @@ class ModernListWidget(QListWidget):
         # Set horizontal scroll bar
         self.setHorizontalScrollBar(ModernScrollBar(Qt.Horizontal, self))
 
+        # Enable editing
+        self.setEditTriggers(QAbstractItemView.DoubleClicked |
+                             QAbstractItemView.EditKeyPressed)
+
         # Additional styling for the list widget (from monolithic version)
         self.setStyleSheet("""
             QListWidget {
@@ -84,6 +87,7 @@ class ModernListWidget(QListWidget):
                 padding: 5px;
             }
         """)
+
 
 class ModernTextEdit(QTextEdit):
     def __init__(self, parent=None):
@@ -97,6 +101,7 @@ class ModernTextEdit(QTextEdit):
                 padding: 5px;
             }
         """)
+
 
 class ModernProgressBar(QProgressBar):
     def __init__(self, parent=None):
@@ -115,6 +120,7 @@ class ModernProgressBar(QProgressBar):
                 border-radius: 5px;
             }
         """)
+
 
 class ModernButton(QPushButton):
     def __init__(self, text, parent=None):

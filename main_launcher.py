@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, Q
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QFont
 
+from ui.about_dialog import AboutDialog
 from ui.ui_components import ModernTextEdit, ModernProgressBar, ModernButton
 from managers.config_manager import ConfigManager
 from managers.theme_manager import ThemeManager
@@ -45,7 +46,7 @@ class FolderOpenerExecutionApp(QMainWindow):
             self.execute_folder_opening()
 
     def setup_ui(self):
-        self.setWindowTitle("Folder Opener Execution")
+        self.setWindowTitle("Multi Folder Opener Launcher")
         self.setMinimumSize(600, 400)
 
         icon_path = os.path.join(self.application_path, 'icons', 'folder_automator.ico')
@@ -58,7 +59,7 @@ class FolderOpenerExecutionApp(QMainWindow):
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(10)
 
-        self.header_label = QLabel("Folder Opener Execution Log")
+        self.header_label = QLabel("Execution Log")
         font = QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -95,12 +96,15 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.execute_button.clicked.connect(self.execute_folder_opening)
         main_layout.addWidget(self.execute_button)
 
-        author_label = QLabel("Created by Avaxerrr")
-        author_label.setAlignment(Qt.AlignRight)
+        self.author_label = QLabel("Created by Avaxerrr")
+        self.author_label.setStyleSheet("color: palette(text); text-decoration: underline; cursor: pointer;")
+        self.author_label.setCursor(Qt.PointingHandCursor)
+        self.author_label.mousePressEvent = self.show_about_dialog
+        self.author_label.setAlignment(Qt.AlignRight)
+        main_layout.addWidget(self.author_label)
         font = QFont()
         font.setItalic(True)
-        author_label.setFont(font)
-        main_layout.addWidget(author_label)
+        self.author_label.setFont(font)
 
         self.setCentralWidget(central_widget)
 
@@ -124,7 +128,7 @@ class FolderOpenerExecutionApp(QMainWindow):
     def open_configurator(self):
         try:
             if getattr(sys, 'frozen', False):
-                configurator_path = os.path.join(self.application_path, "folder_opener_configurator.exe")
+                configurator_path = os.path.join(self.application_path, "configurator.exe")
             else:
                 configurator_path = os.path.join(self.application_path, "main_configurator.py")
 
@@ -132,10 +136,10 @@ class FolderOpenerExecutionApp(QMainWindow):
                 subprocess.Popen([configurator_path] if getattr(sys, 'frozen', False)
                                else [sys.executable, configurator_path])
             else:
-                raise FileNotFoundError("Configurator application not found")
+                raise FileNotFoundError("Configurator not found")
         except Exception as e:
             QMessageBox.critical(self, "Error",
-                f"Could not launch folder opener configurator:\n{str(e)}")
+                f"Could not open the configurator:\n{str(e)}")
 
     def execute_folder_opening(self):
         if self.folder_thread and self.folder_thread.isRunning():
@@ -167,6 +171,10 @@ class FolderOpenerExecutionApp(QMainWindow):
                 QTimer.singleShot(delay_ms, self.close)
         else:
             self.log(f"Folder opening process failed: {message}")
+
+    def show_about_dialog(self, event):
+        dialog = AboutDialog(self)
+        dialog.exec()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
