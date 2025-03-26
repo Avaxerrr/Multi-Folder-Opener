@@ -2,7 +2,10 @@
 
 A Windows utility that streamlines your workflow by opening multiple folders simultaneously in Windows Explorer tabs.
 
-![Multi Folder Opener](screenshots/main_screenshot.png)
+| Configurator | Launcher |
+|---------|---------|
+| <img src="https://github.com/user-attachments/assets/378d4439-886b-448b-95d9-03d40569db26" width="100%"> | <img src="https://github.com/user-attachments/assets/f7918855-0c48-4843-84cd-39602b739d42" width="100%"> |
+
 
 ## Features
 
@@ -47,7 +50,7 @@ The Launcher opens your configured folders in Windows Explorer:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](license.md) file for details.
 
 ## Acknowledgments
 
