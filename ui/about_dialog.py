@@ -1,4 +1,3 @@
-# about_dialog.py
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QFrame
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QFont, QDesktopServices
@@ -8,10 +7,11 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("About Multi Folder Opener")
-        self.setFixedSize(450, 500)
+        self.setFixedSize(450, 520)  # Slightly increased height for better spacing
 
-        # Main layout
+        # Main layout with margins
         layout = QVBoxLayout()
+        layout.setContentsMargins(30, 20, 30, 20)  # Added margins on all sides
         self.setLayout(layout)
 
         # App title
@@ -66,14 +66,16 @@ class AboutDialog(QDialog):
 
         # Author
         author_label = QLabel("Created by Avaxerrr")
+        author_label.setFont(QFont("", weight=QFont.Bold))
         author_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(author_label)
 
-        # GitHub link
-        github_link = QLabel("<a href='https://github.com/Avaxerrr/Multi-Folder-Opener.git'>GitHub Repository</a>")
+        # GitHub link with updated text
+        github_link = QLabel("Check for updates of the app here:<br><a href='https://github.com/Avaxerrr/Multi-Folder-Opener.git'>GitHub Repository</a>")
         github_link.setOpenExternalLinks(True)
         github_link.setAlignment(Qt.AlignCenter)
         layout.addWidget(github_link)
+        layout.addSpacing(10)
 
         # License
         license_label = QLabel("Copyright © 2025 Avaxerrr. Licensed under the MIT License.")
@@ -93,12 +95,6 @@ class AboutDialog(QDialog):
         launcher_credit.setAlignment(Qt.AlignCenter)
         layout.addWidget(launcher_credit)
 
-        configurator_credit = QLabel(
-            "Configurator icon created by <a href='https://www.flaticon.com/authors/basic-rounded/flat'>Basic Round Flat</a> from <a href='https://www.flaticon.com/'>Flaticon</a>")
-        configurator_credit.setOpenExternalLinks(True)
-        configurator_credit.setAlignment(Qt.AlignCenter)
-        layout.addWidget(configurator_credit)
-
         layout.addStretch()
 
         # Close button
@@ -114,10 +110,11 @@ class AboutDialog(QDialog):
 
         layout.addLayout(button_layout)
 
-        # Apply theme-compatible styling
+        # Apply theme-compatible styling with border
         self.setStyleSheet("""
             QDialog {
                 background-color: palette(window);
+                border: 1px solid palette(mid);
             }
             QPushButton {
                 background-color: #4CAF50;

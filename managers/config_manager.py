@@ -1,5 +1,3 @@
-# config_manager.py
-
 import os
 import json
 from PySide6.QtWidgets import QMessageBox
@@ -14,21 +12,24 @@ class ConfigManager:
         folders = []
         sleep_timers = {
             "explorer_startup": 1.0,
-            "new_tab": 0.3,
-            "address_bar_focus": 0.2,
-            "after_typing": 0.2,
+            "new_tab": 0.5,
+            "address_bar_focus": 0.3,
+            "after_typing": 0.3,
             "after_enter": 0.3
         }
         start_instantly = False
         auto_close = False
         auto_close_delay = 1.5
 
+        # Flag to indicate if this is first run or using default config
+        is_first_run = False
+
         # Check if config file exists, if not create a default one
         if not os.path.exists(self.config_path):
             default_config = {
                 "folders": [
                     "C:\\Users\\Work\\Desktop",
-                    "Add you folder locations here..."
+                    "Add you folder locations here...(Please delete this)"
                 ],
                 "sleep_timers": sleep_timers,
                 "start_instantly": False,
@@ -44,16 +45,24 @@ class ConfigManager:
                 start_instantly = default_config['start_instantly']
                 auto_close = default_config['auto_close']
                 auto_close_delay = default_config['auto_close_delay']
+
+                # Set the first run flag to True
+                is_first_run = True
+
             except Exception as e:
                 if parent_widget:
                     QMessageBox.critical(parent_widget, "Error", f"Error creating config file: {e}")
-                return folders, sleep_timers, start_instantly, auto_close, auto_close_delay
+                return folders, sleep_timers, start_instantly, auto_close, auto_close_delay, is_first_run
 
         # Read config from file
         try:
             with open(self.config_path, 'r') as f:
                 config = json.load(f)
                 folders = config.get('folders', [])
+
+                # Check if folders list contains only default/placeholder entries
+                if len(folders) <= 2 and any(folder.startswith("Add you folder") for folder in folders):
+                    is_first_run = True
 
                 # Normalize paths to Windows format
                 folders = [os.path.normpath(folder) for folder in folders]
@@ -80,7 +89,7 @@ class ConfigManager:
             if parent_widget:
                 QMessageBox.critical(parent_widget, "Error", f"Error loading config: {e}")
 
-        return folders, sleep_timers, start_instantly, auto_close, auto_close_delay
+        return folders, sleep_timers, start_instantly, auto_close, auto_close_delay, is_first_run
 
     def save_config(self, folders, sleep_timers, start_instantly, parent_widget=None, auto_close=False,
                     auto_close_delay=1.5):

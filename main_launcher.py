@@ -1,10 +1,9 @@
-# main_launcher.py
+# new launcher that accommodate the new settings configurator
 
 import sys
 import os
-import subprocess
 from datetime import datetime
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QMessageBox, QPushButton
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QMessageBox, QPushButton, QDialog
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QFont
 
@@ -13,6 +12,8 @@ from ui.ui_components import ModernTextEdit, ModernProgressBar, ModernButton
 from managers.config_manager import ConfigManager
 from managers.theme_manager import ThemeManager
 from core.folder_operations import FolderOpeningThread
+from settings import ConfiguratorDialog
+
 
 class FolderOpenerExecutionApp(QMainWindow):
     def __init__(self):
@@ -26,7 +27,7 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.config_path = os.path.join(self.application_path, 'folders_config.json')
 
         self.config_manager = ConfigManager(self.config_path)
-        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay = self.config_manager.load_config(self)
+        self.load_config()
 
         self.setup_ui()
 
@@ -47,6 +48,14 @@ class FolderOpenerExecutionApp(QMainWindow):
             self.log("Auto-execution enabled in config. Starting folder opening process...")
             self.execute_folder_opening()
 
+        # Show welcome dialog if this is first run
+        if self.is_first_run:
+            self.show_welcome_dialog()
+
+    def load_config(self):
+        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, self.is_first_run = self.config_manager.load_config(
+            self)
+
     def setup_ui(self):
         self.setWindowTitle("Multi Folder Opener Launcher")
         self.setMinimumSize(600, 400)
@@ -55,6 +64,7 @@ class FolderOpenerExecutionApp(QMainWindow):
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
             QApplication.instance().setWindowIcon(QIcon(icon_path))
+
 
         central_widget = QWidget()
         main_layout = QVBoxLayout(central_widget)
@@ -128,20 +138,14 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.log_text.append(log_entry)
 
     def open_configurator(self):
-        try:
-            if getattr(sys, 'frozen', False):
-                configurator_path = os.path.join(self.application_path, "configurator.exe")
-            else:
-                configurator_path = os.path.join(self.application_path, "main_configurator.py")
+        dialog = ConfiguratorDialog(self)
+        if dialog.exec() == QDialog.Accepted:
+            self.reload_config()
 
-            if os.path.exists(configurator_path):
-                subprocess.Popen([configurator_path] if getattr(sys, 'frozen', False)
-                               else [sys.executable, configurator_path])
-            else:
-                raise FileNotFoundError("Configurator not found")
-        except Exception as e:
-            QMessageBox.critical(self, "Error",
-                f"Could not open the configurator:\n{str(e)}")
+    def reload_config(self):
+        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, _ = self.config_manager.load_config(
+            self)
+        self.log("Configuration reloaded.")
 
     def execute_folder_opening(self):
         if self.folder_thread and self.folder_thread.isRunning():
@@ -166,9 +170,8 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.execute_button.setEnabled(True)
         if success:
             self.log("Folder opening process completed successfully.")
-            # Check if auto-close is enabled and close the application if it is
             if self.auto_close:
-                delay_ms = int(self.auto_close_delay * 1000)  # Convert seconds to milliseconds
+                delay_ms = int(self.auto_close_delay * 1000)
                 self.log(f"Auto-close enabled. Closing application in {self.auto_close_delay} seconds...")
                 QTimer.singleShot(delay_ms, self.close)
         else:
@@ -177,6 +180,19 @@ class FolderOpenerExecutionApp(QMainWindow):
     def show_about_dialog(self, event):
         dialog = AboutDialog(self)
         dialog.exec()
+
+    def show_welcome_dialog(self):
+        welcome_box = QMessageBox(self)
+        welcome_box.setWindowTitle("Welcome to Multi Folder Opener")
+        welcome_box.setIcon(QMessageBox.Information)
+        welcome_box.setText("Before you can use it, you need to configure which folders to open.\n Please click 'Open Configurator' to set up your folder paths.")
+        (QMessageBox.Ok)
+
+        # Use the application icon for the dialog
+        if self.windowIcon():
+            welcome_box.setWindowIcon(self.windowIcon())
+
+        welcome_box.exec()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

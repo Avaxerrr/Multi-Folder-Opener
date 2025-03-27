@@ -1,16 +1,14 @@
-#  main_configurator original.py
+# settings_dialog (this is from the configurator).py
 
+import subprocess
 import sys
 import os
-import subprocess
-import darkdetect
-from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
-                               QHBoxLayout, QPushButton, QLabel, QMessageBox,
-                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox, QMenu, QListWidgetItem)
+
+from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QMessageBox,
+                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox, QMenu, QListWidgetItem, QDialog)
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QFont
 
-# Import our modules
 from ui.ui_components import ModernListWidget
 from managers.theme_manager import ThemeManager
 from managers.config_manager import ConfigManager
@@ -18,42 +16,28 @@ from core.folder_operations import FolderOperations
 from managers.startup_manager import StartupManager
 from ui.about_dialog import AboutDialog
 
+class ConfiguratorDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Configurator")
+        self.setMinimumSize(700, 500)
 
-class FolderOpenerConfigApp(QMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        # Get the directory where the executable is located
         if getattr(sys, 'frozen', False):
             self.application_path = os.path.dirname(sys.executable)
         else:
             self.application_path = os.path.dirname(os.path.abspath(__file__))
 
-        # Path to the config file
         self.config_path = os.path.join(self.application_path, 'folders_config.json')
-
-        # Initialize config manager
         self.config_manager = ConfigManager(self.config_path)
 
         # Initialize folders list and sleep timers
-        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, self.is_first_run = self.config_manager.load_config(
-            self)
+        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, _ = self.config_manager.load_config(self)
 
-        # Setup UI
-        self.setWindowTitle("Multi Folder Opener Configurator")
-        self.setMinimumSize(700, 500)
+        self.setup_ui()
+        self.setup_theme()
 
-        # Set application icon
-        # Replace 'app_icon.ico' with your actual icon file path
-        icon_path = os.path.join(self.application_path, 'icons', 'configurator.ico')
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
-            app = QApplication.instance()
-            app.setWindowIcon(QIcon(icon_path))
-
-        # Create central widget and layout
-        central_widget = QWidget()
-        main_layout = QVBoxLayout(central_widget)
+    def setup_ui(self):
+        main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(10)
 
@@ -184,7 +168,6 @@ class FolderOpenerConfigApp(QMainWindow):
         # Create options group
         options_group = QGroupBox("Launch Options")
         options_layout = QGridLayout(options_group)
-        options_layout.setContentsMargins(20, 10, 20, 10)  # Add padding to shift content inward
 
         # Start instantly checkbox (left column)
         self.start_instantly_checkbox = QCheckBox("Start instantly when launched")
@@ -193,7 +176,8 @@ class FolderOpenerConfigApp(QMainWindow):
             "If checked, the folder opener will automatically open all folders when launched.\n"
             "This is useful if you want to set up a shortcut to quickly open all your folders."
         )
-        options_layout.addWidget(self.start_instantly_checkbox, 0, 0, Qt.AlignLeft)  # Row 0, Column 0
+        self.start_instantly_checkbox.setChecked(self.start_instantly)
+        options_layout.addWidget(self.start_instantly_checkbox, 0, 0, Qt.AlignLeft)
 
         # Start on Windows boot checkbox (right column)
         self.start_on_boot_checkbox = QCheckBox("Start on Windows boot")
@@ -202,30 +186,30 @@ class FolderOpenerConfigApp(QMainWindow):
         )
         # Check if startup shortcut exists and set checkbox accordingly
         self.start_on_boot_checkbox.setChecked(StartupManager.check_startup_shortcut_exists())
-        options_layout.addWidget(self.start_on_boot_checkbox, 0, 1, Qt.AlignRight)  # Row 0, Column 1
+        options_layout.addWidget(self.start_on_boot_checkbox, 0, 1, Qt.AlignRight)
 
         # Auto-close executioner checkbox (left column)
         self.auto_close_checkbox = QCheckBox("Auto-close the launcher when complete")
-        self.auto_close_checkbox.setChecked(self.auto_close if hasattr(self, 'auto_close') else False)
+        self.auto_close_checkbox.setChecked(self.auto_close)
         self.auto_close_checkbox.setToolTip(
             "If checked, the executioner will automatically close after opening all folders."
         )
-        options_layout.addWidget(self.auto_close_checkbox, 1, 0, Qt.AlignLeft)  # Row 1, Column 0
+        options_layout.addWidget(self.auto_close_checkbox, 1, 0, Qt.AlignLeft)
 
         # Auto-close delay layout (left column, below checkbox)
         auto_close_delay_layout = QHBoxLayout()
         auto_close_delay_layout.addWidget(QLabel("Close delay:"))
         self.auto_close_delay_spin = QDoubleSpinBox()
-        self.auto_close_delay_spin.setRange(0.1, 10.0)  # 0.5 to 10 seconds
+        self.auto_close_delay_spin.setRange(0.1, 10.0)
         self.auto_close_delay_spin.setSingleStep(0.1)
-        self.auto_close_delay_spin.setValue(self.auto_close_delay if hasattr(self, 'auto_close_delay') else 1.5)
+        self.auto_close_delay_spin.setValue(self.auto_close_delay)
         self.auto_close_delay_spin.setSuffix(" seconds")
         self.auto_close_delay_spin.setToolTip(
             "Delay in seconds before closing the executioner after completing folder opening."
         )
         auto_close_delay_layout.addWidget(self.auto_close_delay_spin)
         auto_close_delay_layout.addStretch(1)
-        options_layout.addLayout(auto_close_delay_layout, 2, 0)  # Row 2, Column 0
+        options_layout.addLayout(auto_close_delay_layout, 2, 0)
 
         main_layout.addWidget(options_group)
 
@@ -236,12 +220,6 @@ class FolderOpenerConfigApp(QMainWindow):
         self.save_button = QPushButton("Save Configuration")
         self.save_button.clicked.connect(self.save_config)
         bottom_buttons_layout.addWidget(self.save_button)
-
-        # Open folders button
-        self.open_button = QPushButton("Start Launcher")
-        self.open_button.clicked.connect(self.open_folders)
-        self.open_button.setStyleSheet("background-color: #4CAF50; color: white; font-weight: bold;")
-        bottom_buttons_layout.addWidget(self.open_button)
 
         main_layout.addLayout(bottom_buttons_layout)
 
@@ -255,34 +233,9 @@ class FolderOpenerConfigApp(QMainWindow):
         font.setItalic(True)
         self.author_label.setFont(font)
 
-        # Set central widget
-        self.setCentralWidget(central_widget)
-
-        # Setup theme
-        ThemeManager.setup_theme(QApplication.instance(), self.open_button)
-
-        # Connect theme change detection
-        self.theme_timer = QTimer(self)
-        self.theme_timer.timeout.connect(self.check_theme)
-        self.theme_timer.start(1000)  # Check every second
-
-        # Connect to application palette changed signal (from monolithic version)
-        app = QApplication.instance()
-        app.paletteChanged.connect(self.on_palette_changed)
-
-        # Store current theme state
-        self.is_dark_mode = darkdetect.isDark()
-
-    def on_palette_changed(self, palette):
-        """Handle palette changes from the application (from monolithic version)"""
-        ThemeManager.setup_theme(QApplication.instance(), self.open_button, True)
-
-    def check_theme(self):
-        # Check if theme has changed
-        current_dark_mode = darkdetect.isDark()
-        if current_dark_mode != self.is_dark_mode:
-            self.is_dark_mode = current_dark_mode
-            ThemeManager.setup_theme(QApplication.instance(), self.open_button, True)
+    # Setup theme
+    def setup_theme(self):
+        ThemeManager.setup_theme(QApplication.instance(), self.save_button)
 
     def add_folders(self):
         if FolderOperations.add_folders(self, self.folders):
@@ -336,43 +289,18 @@ class FolderOpenerConfigApp(QMainWindow):
             auto_close=self.auto_close,
             auto_close_delay=self.auto_close_delay
         )
+        self.accept()
 
-    def open_folders(self):
-        """Open the launcher application"""
-        try:
-            # Get the correct path based on execution environment
-            if getattr(sys, 'frozen', False):
-                # Packaged executable path
-                launcher_path = os.path.join(self.application_path, "launcher.exe")
-            else:
-                # Development environment path
-                launcher_path = os.path.join(self.application_path, "main_launcher.py")
-
-            # Launch the executioner
-            if os.path.exists(launcher_path):
-                subprocess.Popen([launcher_path] if getattr(sys, 'frozen', False)
-                                 else [sys.executable, launcher_path])
-            else:
-                raise FileNotFoundError("Launcher not found")
-
-        except Exception as e:
-            QMessageBox.critical(self, "Error",
-                                 f"Could not open the launcher:\n{str(e)}")
-
-    # Add these methods to your FolderOpenerConfigApp class:
     def on_folder_edited(self, item):
-        """Handle when a folder path is edited in the list"""
         FolderOperations.edit_folder_path(item, self.folders_list, self.folders)
 
     def show_folder_context_menu(self, position):
-        """Show context menu for folder items"""
         item = self.folders_list.itemAt(position)
         if not item:
             return
 
+        # Context menu and actions
         context_menu = QMenu(self)
-
-        # Add actions
         edit_action = context_menu.addAction("Edit Path")
         explore_action = context_menu.addAction("Open in Explorer")
         remove_action = context_menu.addAction("Remove")
@@ -387,7 +315,6 @@ class FolderOpenerConfigApp(QMainWindow):
             try:
                 folder_path = item.text()
                 if os.path.exists(folder_path):
-                    # Open the folder in Explorer
                     subprocess.Popen(f'explorer "{folder_path}"')
                 else:
                     QMessageBox.warning(self, "Warning", f"The path '{folder_path}' doesn't exist.")
@@ -398,20 +325,12 @@ class FolderOpenerConfigApp(QMainWindow):
             self.folders.pop(index)
             self.folders_list.takeItem(index)
 
-    def update_folders_list(self):
-        self.folders_list.clear()
-        for folder in self.folders:
-            item = QListWidgetItem(folder)
-            item.setFlags(item.flags() | Qt.ItemIsEditable)
-            self.folders_list.addItem(item)
-
     def show_about_dialog(self, event):
         dialog = AboutDialog(self)
         dialog.exec()
 
-
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = FolderOpenerConfigApp()
-    window.show()
+    dialog = ConfiguratorDialog()
+    dialog.show()
     sys.exit(app.exec())
