@@ -4,10 +4,12 @@ import os
 import json
 from PySide6.QtWidgets import QMessageBox
 
+from app_config import CONFIG_PATH
+
 
 class ConfigManager:
     def __init__(self, config_path):
-        self.config_path = config_path
+        self.config_path = CONFIG_PATH
 
     def load_config(self, parent_widget=None):
         # Default values

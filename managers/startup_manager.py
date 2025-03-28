@@ -1,10 +1,9 @@
-#  startup_manager.py
-
 import os
 import sys
 import pythoncom
 import win32com.client
 from PySide6.QtWidgets import QMessageBox
+from app_config import APP_ROOT
 
 
 class StartupManager:
@@ -29,7 +28,7 @@ class StartupManager:
         return os.path.exists(shortcut_path)
 
     @staticmethod
-    def create_startup_shortcut(application_path, parent_widget=None):
+    def create_startup_shortcut(parent_widget=None):
         """Create a shortcut in the Windows Startup folder"""
         try:
             # Initialize COM
@@ -38,10 +37,10 @@ class StartupManager:
             # Get the path to the executable or script
             if getattr(sys, 'frozen', False):
                 # Running as executable
-                target_path = os.path.join(application_path, "launcher.exe") # need to change for the final executable name
+                target_path = os.path.join(APP_ROOT, "launcher.exe") # need to change for the final executable name
             else:
                 # Running as script
-                target_path = os.path.join(application_path, "main_launcher.py")
+                target_path = os.path.join(APP_ROOT, "main_launcher.py")
                 # For scripts, we need to use the Python interpreter
                 if not os.path.exists(target_path):
                     if parent_widget:
@@ -60,14 +59,14 @@ class StartupManager:
             if getattr(sys, 'frozen', False):
                 # For executable
                 shortcut.Targetpath = target_path
-                shortcut.WorkingDirectory = application_path
+                shortcut.WorkingDirectory = APP_ROOT
             else:
                 # For script
                 shortcut.Targetpath = sys.executable
                 shortcut.Arguments = f'"{target_path}"'
-                shortcut.WorkingDirectory = application_path
+                shortcut.WorkingDirectory = APP_ROOT
 
-            shortcut.IconLocation = os.path.join(application_path, 'icons', 'launcher.ico')
+            shortcut.IconLocation = os.path.join(APP_ROOT, 'icons', 'launcher.ico')
             shortcut.Description = "Folder Opener Launcher"
             shortcut.save()
 

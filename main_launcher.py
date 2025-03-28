@@ -12,7 +12,8 @@ from ui.ui_components import ModernTextEdit, ModernProgressBar, ModernButton
 from managers.config_manager import ConfigManager
 from managers.theme_manager import ThemeManager
 from core.folder_operations import FolderOpeningThread
-from settings import ConfiguratorDialog
+from ui.settings.configurator import ConfiguratorDialog
+from app_config import CONFIG_PATH, APP_ROOT
 
 
 class FolderOpenerExecutionApp(QMainWindow):
@@ -24,9 +25,8 @@ class FolderOpenerExecutionApp(QMainWindow):
         else:
             self.application_path = os.path.dirname(os.path.abspath(__file__))
 
-        self.config_path = os.path.join(self.application_path, 'folders_config.json')
+        self.config_manager = ConfigManager(CONFIG_PATH)
 
-        self.config_manager = ConfigManager(self.config_path)
         self.load_config()
 
         self.setup_ui()
