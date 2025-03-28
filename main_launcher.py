@@ -1,4 +1,4 @@
-# new launcher that accommodate the new settings configurator
+# launcher.py
 
 import sys
 import os

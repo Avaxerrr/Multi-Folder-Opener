@@ -1,4 +1,4 @@
-# settings_dialog (this is from the configurator).py
+# settings.py
 
 import subprocess
 import sys
@@ -328,9 +328,3 @@ class ConfiguratorDialog(QDialog):
     def show_about_dialog(self, event):
         dialog = AboutDialog(self)
         dialog.exec()
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    dialog = ConfiguratorDialog()
-    dialog.show()
-    sys.exit(app.exec())
