@@ -1,10 +1,6 @@
 # configurator.py
 
-import os
-import sys
-
 from PySide6.QtWidgets import QDialog, QVBoxLayout
-from PySide6.QtCore import Qt
 
 from managers.config_manager import ConfigManager
 from managers.startup_manager import StartupManager

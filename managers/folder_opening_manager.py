@@ -17,10 +17,11 @@ class FolderOpeningManager:
         self.auto_close = False
         self.auto_close_delay = 0
 
-    def set_ui_components(self, progress_bar, execute_button):
+    def set_ui_components(self, progress_bar, execute_button, cancel_button):
         """Set UI components that will be updated during folder opening"""
         self.progress_bar = progress_bar
         self.execute_button = execute_button
+        self.cancel_button = cancel_button
 
     def set_config(self, folders, sleep_timers, auto_close, auto_close_delay):
         """Set configuration parameters for folder opening"""
@@ -52,6 +53,9 @@ class FolderOpeningManager:
         if self.execute_button:
             self.execute_button.setEnabled(False)
 
+        if self.cancel_button:
+            self.cancel_button.setEnabled(True)  # Enable cancel button when process starts
+
         if self.progress_bar:
             self.progress_bar.setValue(0)
 
@@ -66,6 +70,23 @@ class FolderOpeningManager:
         self.folder_thread.finished_signal.connect(self.on_folder_opening_finished)
         self.folder_thread.start()
 
+    def on_folder_opening_finished(self, success, message):
+        """Handle completion of folder opening process"""
+        if self.execute_button:
+            self.execute_button.setEnabled(True)
+
+        if self.cancel_button:
+            self.cancel_button.setEnabled(False)  # Disable cancel button when process finishes
+
+        if success:
+            self.log("Folder opening process completed successfully.")
+            if self.auto_close:
+                delay_ms = int(self.auto_close_delay * 1000)
+                self.log(f"Auto-close enabled. Closing application in {self.auto_close_delay} seconds...")
+                QTimer.singleShot(delay_ms, self._auto_close)
+        else:
+            self.log(f"Folder opening process failed: {message}", logging.ERROR)
+
     def _on_log(self, message):
         """Handle log messages from the folder opening thread"""
         self.log(message)
@@ -77,8 +98,12 @@ class FolderOpeningManager:
 
     def on_folder_opening_finished(self, success, message):
         """Handle completion of folder opening process"""
+        self.log("Folder opening process finished, disabling cancel button")
         if self.execute_button:
             self.execute_button.setEnabled(True)
+
+        if self.cancel_button:
+            self.cancel_button.setEnabled(False)
 
         if success:
             self.log("Folder opening process completed successfully.")
@@ -104,3 +129,5 @@ class FolderOpeningManager:
                 self.execute_button.setEnabled(True)
             if self.progress_bar:
                 self.progress_bar.setValue(0)
+            if self.cancel_button:
+                self.cancel_button.setEnabled(False)

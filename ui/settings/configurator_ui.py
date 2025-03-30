@@ -1,10 +1,9 @@
 # configurator_ui.py
 
-import os
-from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QMessageBox,
-                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox, QMenu, QListWidgetItem)
+from PySide6.QtWidgets import (QApplication, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
+                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox)
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon, QFont
+from PySide6.QtGui import QFont
 
 from ui.ui_components import ModernListWidget
 from managers.theme_manager import ThemeManager

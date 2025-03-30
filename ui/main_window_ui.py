@@ -15,6 +15,7 @@ class MainWindowUI:
         self.log_text = None
         self.progress_bar = None
         self.execute_button = None
+        self.cancel_button = None
         self.open_configurator_button = None
         self.author_label = None
 
@@ -41,13 +42,17 @@ class MainWindowUI:
         main_layout.addWidget(header_label)
 
         # Warning label
-        warning_label = QLabel("WARNING: Please do not interact with your computer during folder opening process!")
+        warning_label = QLabel("⚠️ WARNING: Please do not interact with your computer during folder opening process!")
         warning_label.setStyleSheet(
             "color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; "
             "border-radius: 4px; padding: 8px; font-weight: bold;"
         )
         warning_label.setAlignment(Qt.AlignCenter)
         main_layout.addWidget(warning_label)
+
+        # Open Configurator button - moved to top
+        self.open_configurator_button = QPushButton("Open Configurator")
+        main_layout.addWidget(self.open_configurator_button)
 
         # Log text area
         self.log_text = ModernTextEdit()
@@ -58,13 +63,23 @@ class MainWindowUI:
         self.progress_bar = ModernProgressBar()
         main_layout.addWidget(self.progress_bar)
 
-        # Configurator button
-        self.open_configurator_button = QPushButton("Open Configurator")
-        main_layout.addWidget(self.open_configurator_button)
+        # Action buttons layout (Cancel and Execute side by side)
+        buttons_layout = QHBoxLayout()
+
+        # Cancel button
+        self.cancel_button = QPushButton("Cancel")
+        self.cancel_button.setEnabled(False)  # Initially disabled
+        buttons_layout.addWidget(self.cancel_button)
+
+        # Add small fixed spacing between buttons (instead of stretch)
+        buttons_layout.addSpacing(10)
 
         # Execute button
         self.execute_button = ModernButton("Execute Folder Opening")
-        main_layout.addWidget(self.execute_button)
+        buttons_layout.addWidget(self.execute_button)
+
+        # Add buttons layout to main layout
+        main_layout.addLayout(buttons_layout)
 
         # Author label
         author_layout = QHBoxLayout()
@@ -84,6 +99,7 @@ class MainWindowUI:
             'log_text': self.log_text,
             'progress_bar': self.progress_bar,
             'execute_button': self.execute_button,
+            'cancel_button': self.cancel_button,
             'open_configurator_button': self.open_configurator_button,
             'author_label': self.author_label
         }

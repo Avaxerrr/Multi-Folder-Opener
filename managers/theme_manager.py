@@ -1,7 +1,7 @@
 # theme_manager.py
 
 import darkdetect
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QPushButton
 from PySide6.QtGui import QPalette, QColor, Qt
 
 
@@ -13,18 +13,18 @@ class ThemeManager:
         return system_theme if system_theme != current_theme else current_theme
 
     @staticmethod
-    def setup_theme(app, button=None, force_update=False):
+    def setup_theme(app, execute_button=None, cancel_button=None, force_update=False):
         """Set up application theme based on system settings"""
         # Set the application style to Fusion (from original)
         QApplication.setStyle("Fusion")
 
         if darkdetect.isDark():
-            ThemeManager.set_dark_theme(app, button, force_update)
+            ThemeManager.set_dark_theme(app, execute_button, cancel_button, force_update)
         else:
-            ThemeManager.set_light_theme(app, button, force_update)
+            ThemeManager.set_light_theme(app, execute_button, cancel_button, force_update)
 
     @staticmethod
-    def set_dark_theme(app, button=None, force_update=False):
+    def set_dark_theme(app, execute_button=None, cancel_button=None, force_update=False):
         """Apply dark theme to the application"""
         if not isinstance(app, QApplication):
             return
@@ -46,27 +46,16 @@ class ThemeManager:
 
         app.setPalette(dark_palette)
 
-        if button:
-            # Green color with add hover/pressed states
-            button.setStyleSheet("""
-                QPushButton {
-                    background-color: #4CAF50;
-                    color: white;
-                    font-weight: bold;
-                    border: none;
-                    border-radius: 4px;
-                    padding: 8px 16px;
-                }
-                QPushButton:hover {
-                    background-color: #45a049;
-                }
-                QPushButton:pressed {
-                    background-color: #3d8b40;
-                }
-            """)
+        # Style execute button
+        if execute_button:
+            ThemeManager.style_execute_button(execute_button)
+
+        # Style cancel button
+        if cancel_button:
+            ThemeManager.style_cancel_button(cancel_button)
 
     @staticmethod
-    def set_light_theme(app, button=None, force_update=False):
+    def set_light_theme(app, execute_button=None, cancel_button=None, force_update=False):
         """Apply light theme to the application"""
         if not isinstance(app, QApplication):
             return
@@ -74,26 +63,69 @@ class ThemeManager:
         # Reset to default palette for light theme (from original)
         app.setPalette(QPalette())
 
-        if button:
-            # Green color with add hover/pressed states
-            button.setStyleSheet("""
-                QPushButton {
-                    background-color: #4CAF50;
-                    color: white;
-                    font-weight: bold;
-                    border: none;
-                    border-radius: 4px;
-                    padding: 8px 16px;
-                }
-                QPushButton:hover {
-                    background-color: #45a049;
-                }
-                QPushButton:pressed {
-                    background-color: #3d8b40;
-                }
-            """)
+        # Style execute button
+        if execute_button:
+            ThemeManager.style_execute_button(execute_button)
+
+        # Style cancel button
+        if cancel_button:
+            ThemeManager.style_cancel_button(cancel_button)
 
     @staticmethod
-    def on_palette_changed(app, button=None):
+    def style_execute_button(button):
+        """Apply execute button styling"""
+        if not isinstance(button, QPushButton):
+            return
+
+        button.setStyleSheet("""
+            QPushButton {
+                background-color: #4CAF50;
+                color: white;
+                font-weight: bold;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+            }
+            QPushButton:hover {
+                background-color: #45a049;
+            }
+            QPushButton:pressed {
+                background-color: #3d8b40;
+            }
+            QPushButton:disabled {
+                background-color: #a5d6a7;
+                color: #e8f5e9;
+            }
+        """)
+
+    @staticmethod
+    def style_cancel_button(button):
+        """Apply cancel button styling"""
+        if not isinstance(button, QPushButton):
+            return
+
+        button.setStyleSheet("""
+            QPushButton {
+                background-color: #f44336;
+                color: white;
+                font-weight: bold;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+            }
+            QPushButton:hover {
+                background-color: #e53935;
+            }
+            QPushButton:pressed {
+                background-color: #d32f2f;
+            }
+            QPushButton:disabled {
+                background-color: #423736;
+                color: #ffebee;
+            }
+        """)
+
+    @staticmethod
+    def on_palette_changed(app, execute_button=None, cancel_button=None):
         """Handle palette change events"""
-        ThemeManager.setup_theme(app, button, True)
+        ThemeManager.setup_theme(app, execute_button, cancel_button, True)

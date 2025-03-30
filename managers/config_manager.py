@@ -16,10 +16,10 @@ class ConfigManager:
         folders = []
         sleep_timers = {
             "explorer_startup": 1.0,
-            "new_tab": 0.5,
+            "new_tab": 0.3,
             "address_bar_focus": 0.3,
             "after_typing": 0.3,
-            "after_enter": 0.3
+            "after_enter": 0.2
         }
         start_instantly = False
         auto_close = False

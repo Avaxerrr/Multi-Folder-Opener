@@ -1,4 +1,4 @@
-# new launcher.py
+# main_launcher.py
 
 import os
 import sys
@@ -14,7 +14,7 @@ from managers.config_manager import ConfigManager
 from managers.theme_manager import ThemeManager
 from managers.folder_opening_manager import FolderOpeningManager
 from ui.main_window_ui import MainWindowUI
-from app_config import CONFIG_PATH, APP_ROOT
+from app_config import CONFIG_PATH
 
 
 class FolderOpenerExecutionApp(QMainWindow):
@@ -60,7 +60,8 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.folder_opening_manager = FolderOpeningManager(self, self.log_manager)
         self.folder_opening_manager.set_ui_components(
             ui_components['progress_bar'],
-            ui_components['execute_button']
+            ui_components['execute_button'],
+            ui_components['cancel_button']
         )
         self.folder_opening_manager.set_config(
             self.folders,
@@ -71,6 +72,7 @@ class FolderOpenerExecutionApp(QMainWindow):
 
         # Connect UI signals
         ui_components['execute_button'].clicked.connect(self.execute_folder_opening)
+        ui_components['cancel_button'].clicked.connect(self.cancel_folder_opening)
         ui_components['open_configurator_button'].clicked.connect(self.open_configurator)
         ui_components['author_label'].mousePressEvent = self.show_about_dialog
 
@@ -80,7 +82,11 @@ class FolderOpenerExecutionApp(QMainWindow):
             return
 
         # Setup theme
-        ThemeManager.setup_theme(QApplication.instance(), ui_components['execute_button'])
+        ThemeManager.setup_theme(
+            QApplication.instance(),
+            ui_components['execute_button'],
+            ui_components['cancel_button']
+        )
         app = QApplication.instance()
         app.paletteChanged.connect(self.on_palette_changed)
 
@@ -116,18 +122,31 @@ class FolderOpenerExecutionApp(QMainWindow):
 
     def on_palette_changed(self, palette):
         """Handle system palette changes"""
-        ThemeManager.on_palette_changed(QApplication.instance(), self.ui_manager.execute_button)
+        ThemeManager.on_palette_changed(
+            QApplication.instance(),
+            self.ui_manager.execute_button,
+            self.ui_manager.cancel_button
+        )
 
     def check_theme(self):
         """Periodically check for theme changes"""
         new_theme = ThemeManager.check_theme(self.current_theme)
         if new_theme != self.current_theme:
             self.current_theme = new_theme
-            ThemeManager.setup_theme(QApplication.instance(), self.ui_manager.execute_button, True)
+            ThemeManager.setup_theme(
+                QApplication.instance(),
+                self.ui_manager.execute_button,
+                self.ui_manager.cancel_button,
+                True
+            )
 
     def execute_folder_opening(self):
         """Start the folder opening process"""
         self.folder_opening_manager.execute_folder_opening()
+
+    def cancel_folder_opening(self):
+        """Cancel the folder opening process"""
+        self.folder_opening_manager.cancel_folder_opening()
 
     def open_configurator(self):
         """Open the configurator dialog"""

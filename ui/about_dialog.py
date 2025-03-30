@@ -1,8 +1,8 @@
 # about_dialog.py
 
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QFrame
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QFont, QDesktopServices
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont
 
 
 class AboutDialog(QDialog):
