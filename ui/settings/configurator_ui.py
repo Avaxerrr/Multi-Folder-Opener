@@ -188,15 +188,26 @@ class ConfiguratorUI:
         self.dialog.main_layout.addLayout(bottom_buttons_layout)
 
     def _setup_author_label(self):
+        # Create horizontal layout for author label
+        author_layout = QHBoxLayout()
+        author_layout.addStretch(1)  # Add stretch to push label to the right
+
+        # Create the author label
         self.author_label = QLabel("Created by Avaxerrr")
         self.author_label.setStyleSheet("color: palette(text); text-decoration: underline; cursor: pointer;")
         self.author_label.setCursor(Qt.PointingHandCursor)
         self.author_label.mousePressEvent = self.show_about_dialog
-        self.author_label.setAlignment(Qt.AlignRight)
-        self.dialog.main_layout.addWidget(self.author_label)
+
+        # Set font
         font = QFont()
         font.setItalic(True)
         self.author_label.setFont(font)
+
+        # Add label to horizontal layout
+        author_layout.addWidget(self.author_label)
+
+        # Add horizontal layout to main layout
+        self.dialog.main_layout.addLayout(author_layout)
 
     def setup_theme(self):
         ThemeManager.setup_theme(QApplication.instance(), self.save_button)

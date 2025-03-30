@@ -1,4 +1,4 @@
-# conf_manager.py
+# config_manager.py
 
 import os
 import json

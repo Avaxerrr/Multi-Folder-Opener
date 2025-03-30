@@ -1,18 +1,19 @@
-# launcher.py
+# new launcher.py
 
-import sys
 import os
-from datetime import datetime
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QMessageBox, QPushButton, QDialog
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QIcon, QFont
+import sys
 
-from ui.about_dialog import AboutDialog
-from ui.ui_components import ModernTextEdit, ModernProgressBar, ModernButton
+from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtGui import QIcon
+
+from managers.log_manager import LogManager
+from managers.dialog_manager import DialogManager
+from managers.command_line_handler import CommandLineHandler
 from managers.config_manager import ConfigManager
 from managers.theme_manager import ThemeManager
-from core.folder_operations import FolderOpeningThread
-from ui.settings.configurator import ConfiguratorDialog
+from managers.folder_opening_manager import FolderOpeningManager
+from ui.main_window_ui import MainWindowUI
 from app_config import CONFIG_PATH, APP_ROOT
 
 
@@ -20,182 +21,130 @@ class FolderOpenerExecutionApp(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        # Set application path
         if getattr(sys, 'frozen', False):
             self.application_path = os.path.dirname(sys.executable)
         else:
             self.application_path = os.path.dirname(os.path.abspath(__file__))
 
-        self.config_manager = ConfigManager(CONFIG_PATH)
+        # Parse command line arguments
+        self.cmd_handler = CommandLineHandler()
+        self.configure_mode = self.cmd_handler.is_configure_mode()
 
+        # Initialize managers
+        self.config_manager = ConfigManager(CONFIG_PATH)
+        self.log_manager = LogManager()
+
+        # Set application icon
+        self.icon = None
+        icon_path = os.path.join(self.application_path, 'icons', 'launcher.ico')
+        if os.path.exists(icon_path):
+            self.icon = QIcon(icon_path)
+            QApplication.instance().setWindowIcon(self.icon)
+            self.setWindowIcon(self.icon)
+
+        # Initialize dialog manager with parent and icon
+        self.dialog_manager = DialogManager(self, self.icon)
+
+        # Load configuration
         self.load_config()
 
-        self.setup_ui()
+        # Initialize UI
+        self.ui_manager = MainWindowUI(self, self.icon)
+        ui_components = self.ui_manager.setup_ui()
 
-        self.folder_thread = None
+        # Set log widget for logger
+        self.log_manager.set_log_widget(ui_components['log_text'])
 
-        self.setup_theme()
+        # Initialize folder opening manager
+        self.folder_opening_manager = FolderOpeningManager(self, self.log_manager)
+        self.folder_opening_manager.set_ui_components(
+            ui_components['progress_bar'],
+            ui_components['execute_button']
+        )
+        self.folder_opening_manager.set_config(
+            self.folders,
+            self.sleep_timers,
+            self.auto_close,
+            self.auto_close_delay
+        )
 
+        # Connect UI signals
+        ui_components['execute_button'].clicked.connect(self.execute_folder_opening)
+        ui_components['open_configurator_button'].clicked.connect(self.open_configurator)
+        ui_components['author_label'].mousePressEvent = self.show_about_dialog
+
+        # Check for configurator command line argument
+        if self.configure_mode:
+            QTimer.singleShot(0, self.open_configurator_and_exit)
+            return
+
+        # Setup theme
+        ThemeManager.setup_theme(QApplication.instance(), ui_components['execute_button'])
         app = QApplication.instance()
         app.paletteChanged.connect(self.on_palette_changed)
 
-        self.current_theme = "light" if not ThemeManager.check_theme("light") == "dark" else "dark"
-
+        # Start theme check timer
+        self.current_theme = "light" if not ThemeManager.check_theme("light") else "dark"
         self.theme_timer = QTimer(self)
         self.theme_timer.timeout.connect(self.check_theme)
         self.theme_timer.start(2000)
 
+        # Auto-start if configured
         if self.start_instantly:
-            self.log("Auto-execution enabled in config. Starting folder opening process...")
+            self.log_manager.info("Auto-execution enabled in config. Starting folder opening process...")
             self.execute_folder_opening()
 
-        # Show welcome dialog if this is first run
+        # Show welcome dialog for first run
         if self.is_first_run:
-            self.show_welcome_dialog()
+            self.dialog_manager.show_welcome_dialog()
 
     def load_config(self):
-        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, self.is_first_run = self.config_manager.load_config(
-            self)
+        """Load configuration from config manager"""
+        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, self.is_first_run = self.config_manager.load_config()
 
-    def setup_ui(self):
-        self.setWindowTitle("Multi Folder Opener Launcher")
-        self.setMinimumSize(600, 400)
-
-        icon_path = os.path.join(self.application_path, 'icons', 'launcher.ico')
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
-            QApplication.instance().setWindowIcon(QIcon(icon_path))
-
-
-        central_widget = QWidget()
-        main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(15, 15, 15, 15)
-        main_layout.setSpacing(10)
-
-        self.header_label = QLabel("Execution Log")
-        font = QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        self.header_label.setFont(font)
-        self.header_label.setContentsMargins(0, 0, 0, 10)
-        main_layout.addWidget(self.header_label)
-
-        # Add warning label
-        self.warning_label = QLabel("⚠️ WARNING: Please do not interact with your computer during folder opening process!")
-        self.warning_label.setStyleSheet(
-            "color: #721c24;"
-            "background-color: #f8d7da;"
-            "border: 1px solid #f5c6cb;"
-            "border-radius: 4px;"
-            "padding: 8px;"
-            "font-weight: bold;"
+    def reload_config(self):
+        """Reload configuration after changes"""
+        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, _ = self.config_manager.load_config()
+        self.folder_opening_manager.set_config(
+            self.folders,
+            self.sleep_timers,
+            self.auto_close,
+            self.auto_close_delay
         )
-        self.warning_label.setAlignment(Qt.AlignCenter)
-        main_layout.addWidget(self.warning_label)
-
-        self.log_text = ModernTextEdit()
-        self.log_text.setReadOnly(True)
-        main_layout.addWidget(self.log_text)
-
-        self.progress_bar = ModernProgressBar()
-        main_layout.addWidget(self.progress_bar)
-
-        # Add the new button to open the configurator
-        self.open_configurator_button = QPushButton("Open Configurator")
-        self.open_configurator_button.clicked.connect(self.open_configurator)
-        main_layout.addWidget(self.open_configurator_button)
-
-        self.execute_button = ModernButton("Execute Folder Opening")
-        self.execute_button.clicked.connect(self.execute_folder_opening)
-        main_layout.addWidget(self.execute_button)
-
-        self.author_label = QLabel("Created by Avaxerrr")
-        self.author_label.setStyleSheet("color: palette(text); text-decoration: underline; cursor: pointer;")
-        self.author_label.setCursor(Qt.PointingHandCursor)
-        self.author_label.mousePressEvent = self.show_about_dialog
-        self.author_label.setAlignment(Qt.AlignRight)
-        main_layout.addWidget(self.author_label)
-        font = QFont()
-        font.setItalic(True)
-        self.author_label.setFont(font)
-
-        self.setCentralWidget(central_widget)
-
-    def setup_theme(self):
-        ThemeManager.setup_theme(QApplication.instance(), self.execute_button)
+        self.log_manager.info("Configuration reloaded.")
 
     def on_palette_changed(self, palette):
-        ThemeManager.setup_theme(QApplication.instance(), self.execute_button, True)
+        """Handle system palette changes"""
+        ThemeManager.on_palette_changed(QApplication.instance(), self.ui_manager.execute_button)
 
     def check_theme(self):
+        """Periodically check for theme changes"""
         new_theme = ThemeManager.check_theme(self.current_theme)
         if new_theme != self.current_theme:
             self.current_theme = new_theme
-            ThemeManager.setup_theme(QApplication.instance(), self.execute_button, True)
-
-    def log(self, message):
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        log_entry = f"[{timestamp}] {message}"
-        self.log_text.append(log_entry)
-
-    def open_configurator(self):
-        dialog = ConfiguratorDialog(self)
-        if dialog.exec() == QDialog.Accepted:
-            self.reload_config()
-
-    def reload_config(self):
-        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, _ = self.config_manager.load_config(
-            self)
-        self.log("Configuration reloaded.")
+            ThemeManager.setup_theme(QApplication.instance(), self.ui_manager.execute_button, True)
 
     def execute_folder_opening(self):
-        if self.folder_thread and self.folder_thread.isRunning():
-            self.log("Folder opening process is already running.")
-            return
+        """Start the folder opening process"""
+        self.folder_opening_manager.execute_folder_opening()
 
-        self.execute_button.setEnabled(False)
-        self.progress_bar.setValue(0)
-        self.log_text.clear()
-        self.log("Starting folder opening process...")
+    def open_configurator(self):
+        """Open the configurator dialog"""
+        self.dialog_manager.open_configurator(self.reload_config)
 
-        self.folder_thread = FolderOpeningThread(self.folders, self.sleep_timers)
-        self.folder_thread.log_signal.connect(self.log)
-        self.folder_thread.progress_signal.connect(self.update_progress)
-        self.folder_thread.finished_signal.connect(self.on_folder_opening_finished)
-        self.folder_thread.start()
-
-    def update_progress(self, value):
-        self.progress_bar.setValue((value + 1) * 100 // len(self.folders))
-
-    def on_folder_opening_finished(self, success, message):
-        self.execute_button.setEnabled(True)
-        if success:
-            self.log("Folder opening process completed successfully.")
-            if self.auto_close:
-                delay_ms = int(self.auto_close_delay * 1000)
-                self.log(f"Auto-close enabled. Closing application in {self.auto_close_delay} seconds...")
-                QTimer.singleShot(delay_ms, self.close)
-        else:
-            self.log(f"Folder opening process failed: {message}")
+    def open_configurator_and_exit(self):
+        """Open configurator and exit when in command line mode"""
+        self.dialog_manager.open_configurator_and_exit(QApplication.instance().quit)
 
     def show_about_dialog(self, event):
-        dialog = AboutDialog(self)
-        dialog.exec()
+        """Show the about dialog"""
+        self.dialog_manager.show_about_dialog()
 
-    def show_welcome_dialog(self):
-        welcome_box = QMessageBox(self)
-        welcome_box.setWindowTitle("Welcome to Multi Folder Opener")
-        welcome_box.setIcon(QMessageBox.Information)
-        welcome_box.setText("Before you can use it, you need to configure which folders to open.\n Please click 'Open Configurator' to set up your folder paths.")
-        (QMessageBox.Ok)
-
-        # Use the application icon for the dialog
-        if self.windowIcon():
-            welcome_box.setWindowIcon(self.windowIcon())
-
-        welcome_box.exec()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = FolderOpenerExecutionApp()
-    window.show()
+    if not ("--configure" in sys.argv or "-c" in sys.argv):
+        window.show()
     sys.exit(app.exec())
