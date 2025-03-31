@@ -118,7 +118,7 @@ class ModernProgressBar(QProgressBar):
             }
 
             QProgressBar::chunk {
-                background-color: #4CAF50;
+                background-color: #3198d4;
                 border-radius: 5px;
             }
         """)
