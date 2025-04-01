@@ -107,11 +107,11 @@ class FolderOpenerExecutionApp(QMainWindow):
 
     def load_config(self):
         """Load configuration from config manager"""
-        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, self.is_first_run = self.config_manager.load_config()
+        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, self.system_tray, self.is_first_run = self.config_manager.load_config()
 
     def reload_config(self):
         """Reload configuration after changes"""
-        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, _ = self.config_manager.load_config()
+        self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, self.system_tray, _ = self.config_manager.load_config()
         self.folder_opening_manager.set_config(
             self.folders,
             self.sleep_timers,
@@ -159,6 +159,32 @@ class FolderOpenerExecutionApp(QMainWindow):
     def show_about_dialog(self, event):
         """Show the about dialog"""
         self.dialog_manager.show_about_dialog()
+
+    def on_folder_opening_complete(self):
+        """Handle completion of folder opening process"""
+        self.log_manager.info("Folder opening process completed.")
+
+        # Check if auto-close is enabled
+        if self.auto_close:
+            self.log_manager.info(f"Auto-close enabled. Will close in {self.auto_close_delay} seconds.")
+
+            # Check if system tray is enabled
+            if self.system_tray:
+                # Hide to system tray instead of closing
+                QTimer.singleShot(int(self.auto_close_delay * 1000), self.hide_to_system_tray)
+            else:
+                # Close the application
+                QTimer.singleShot(int(self.auto_close_delay * 1000), self.close_application)
+
+    def hide_to_system_tray(self):
+        """Hide the main window to system tray"""
+        self.log_manager.info("Hiding to system tray.")
+        self.parent.hide()
+
+    def close_application(self):
+        """Close the application"""
+        self.log_manager.info("Closing application.")
+        self.parent.close()
 
 
 if __name__ == "__main__":

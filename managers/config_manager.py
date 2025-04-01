@@ -1,5 +1,3 @@
-# config_manager.py
-
 import os
 import json
 from PySide6.QtWidgets import QMessageBox
@@ -24,6 +22,7 @@ class ConfigManager:
         start_instantly = False
         auto_close = False
         auto_close_delay = 1.5
+        system_tray = False
 
         # Flag to indicate if this is first run or using default config
         is_first_run = False
@@ -38,7 +37,8 @@ class ConfigManager:
                 "sleep_timers": sleep_timers,
                 "start_instantly": False,
                 "auto_close": False,
-                "auto_close_delay": 1.5
+                "auto_close_delay": 1.5,
+                "system_tray": False
             }
 
             try:
@@ -49,6 +49,7 @@ class ConfigManager:
                 start_instantly = default_config['start_instantly']
                 auto_close = default_config['auto_close']
                 auto_close_delay = default_config['auto_close_delay']
+                system_tray = default_config['system_tray']
 
                 # Set the first run flag to True
                 is_first_run = True
@@ -56,7 +57,7 @@ class ConfigManager:
             except Exception as e:
                 if parent_widget:
                     QMessageBox.critical(parent_widget, "Error", f"Error creating config file: {e}")
-                return folders, sleep_timers, start_instantly, auto_close, auto_close_delay, is_first_run
+                return folders, sleep_timers, start_instantly, auto_close, auto_close_delay, system_tray, is_first_run
 
         # Read config from file
         try:
@@ -89,14 +90,17 @@ class ConfigManager:
                 # Load auto_close_delay setting if it exists
                 auto_close_delay = config.get('auto_close_delay', 1.5)
 
+                # Load system_tray setting if it exists
+                system_tray = config.get('system_tray', False)
+
         except Exception as e:
             if parent_widget:
                 QMessageBox.critical(parent_widget, "Error", f"Error loading config: {e}")
 
-        return folders, sleep_timers, start_instantly, auto_close, auto_close_delay, is_first_run
+        return folders, sleep_timers, start_instantly, auto_close, auto_close_delay, system_tray, is_first_run
 
     def save_config(self, folders, sleep_timers, start_instantly, parent_widget=None, auto_close=False,
-                    auto_close_delay=1.5):
+                    auto_close_delay=1.5, system_tray=False):
         try:
             # Normalize all folder paths to Windows format
             normalized_folders = [os.path.normpath(folder) for folder in folders]
@@ -106,7 +110,8 @@ class ConfigManager:
                 "sleep_timers": sleep_timers,
                 "start_instantly": start_instantly,
                 "auto_close": auto_close,
-                "auto_close_delay": auto_close_delay
+                "auto_close_delay": auto_close_delay,
+                "system_tray": system_tray
             }
 
             with open(self.config_path, 'w') as f:

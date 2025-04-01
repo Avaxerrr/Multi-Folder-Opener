@@ -1,5 +1,3 @@
-# configurator_ui.py
-
 from PySide6.QtWidgets import (QApplication, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
                                QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox)
 from PySide6.QtCore import Qt
@@ -10,6 +8,7 @@ from managers.theme_manager import ThemeManager
 from managers.startup_manager import StartupManager
 from ui.settings.ui_resources import UIResources
 from ui.about_dialog import AboutDialog
+
 
 class ConfiguratorUI:
     def __init__(self, dialog):
@@ -38,7 +37,6 @@ class ConfiguratorUI:
         self._setup_timing_section()
         self._setup_options_section()
         self._setup_bottom_buttons()
-        self._setup_author_label()
 
     def _setup_folders_section(self):
         # Create folders group
@@ -138,30 +136,62 @@ class ConfiguratorUI:
     def _setup_options_section(self):
         # Create options group
         options_group = QGroupBox("Launch Options")
-        options_layout = QGridLayout(options_group)
+        options_layout = QVBoxLayout(options_group)
 
-        # Start instantly checkbox (left column)
-        self.start_instantly_checkbox = QCheckBox("Start instantly when launched")
-        self.start_instantly_checkbox.setChecked(self.dialog.start_instantly)
-        self.start_instantly_checkbox.setToolTip(self.tooltips["start_instantly"])
-        self.start_instantly_checkbox.setChecked(self.dialog.start_instantly)
-        options_layout.addWidget(self.start_instantly_checkbox, 0, 0, Qt.AlignLeft)
+        # System Access Options section
+        system_access_label = QLabel("System Access Options:")
+        font = QFont()
+        font.setBold(True)
+        system_access_label.setFont(font)
+        options_layout.addWidget(system_access_label)
 
-        # Start on Windows boot checkbox (right column)
+        # System tray checkbox
+        self.system_tray_checkbox = QCheckBox("Run in system tray")
+        self.system_tray_checkbox.setChecked(self.dialog.system_tray)
+        if "system_tray" in self.tooltips:
+            self.system_tray_checkbox.setToolTip(self.tooltips["system_tray"])
+        else:
+            self.system_tray_checkbox.setToolTip("Run the application in system tray for easy access")
+        options_layout.addWidget(self.system_tray_checkbox)
+
+        # Start on Windows boot checkbox
         self.start_on_boot_checkbox = QCheckBox("Start on Windows boot")
         self.start_on_boot_checkbox.setToolTip(self.tooltips["start_on_boot"])
         # Check if startup shortcut exists and set checkbox accordingly
         self.start_on_boot_checkbox.setChecked(StartupManager.check_startup_shortcut_exists())
-        options_layout.addWidget(self.start_on_boot_checkbox, 0, 1, Qt.AlignRight)
+        options_layout.addWidget(self.start_on_boot_checkbox)
 
-        # Auto-close executioner checkbox (left column)
+        # Add some spacing
+        options_layout.addSpacing(10)
+
+        # Quick Launch Options section
+        quick_launch_label = QLabel("Quick Launch Options:")
+        quick_launch_label.setFont(font)
+        options_layout.addWidget(quick_launch_label)
+
+        # Note about shortcuts
+        shortcut_note = QLabel(
+            "Note: Enabling these options will automatically create shortcuts to ensure you can always access the configurator.")
+        shortcut_note.setWordWrap(True)
+        shortcut_note.setStyleSheet("color: #666; font-style: italic;")
+        options_layout.addWidget(shortcut_note)
+
+        # Start instantly checkbox
+        self.start_instantly_checkbox = QCheckBox("Start instantly when launched")
+        self.start_instantly_checkbox.setChecked(self.dialog.start_instantly)
+        self.start_instantly_checkbox.setToolTip(self.tooltips["start_instantly"])
+        options_layout.addWidget(self.start_instantly_checkbox)
+
+        # Auto-close checkbox and delay
+        auto_close_layout = QVBoxLayout()
         self.auto_close_checkbox = QCheckBox("Auto-close the launcher when complete")
         self.auto_close_checkbox.setChecked(self.dialog.auto_close)
         self.auto_close_checkbox.setToolTip(self.tooltips["auto_close"])
-        options_layout.addWidget(self.auto_close_checkbox, 1, 0, Qt.AlignLeft)
+        auto_close_layout.addWidget(self.auto_close_checkbox)
 
-        # Auto-close delay layout (left column, below checkbox)
+        # Auto-close delay layout
         auto_close_delay_layout = QHBoxLayout()
+        auto_close_delay_layout.addSpacing(20)  # Indent
         auto_close_delay_layout.addWidget(QLabel("Close delay:"))
         self.auto_close_delay_spin = QDoubleSpinBox()
         self.auto_close_delay_spin.setRange(0.1, 10.0)
@@ -171,27 +201,36 @@ class ConfiguratorUI:
         self.auto_close_delay_spin.setToolTip(self.tooltips["auto_close_delay"])
         auto_close_delay_layout.addWidget(self.auto_close_delay_spin)
         auto_close_delay_layout.addStretch(1)
-        options_layout.addLayout(auto_close_delay_layout, 2, 0)
+        auto_close_layout.addLayout(auto_close_delay_layout)
+
+        options_layout.addLayout(auto_close_layout)
+
+        # System tray behavior note
+        system_tray_note = QLabel(
+            "When system tray is enabled, auto-close will hide the launcher instead of quitting it.")
+        system_tray_note.setWordWrap(True)
+        system_tray_note.setStyleSheet("color: #666; font-style: italic;")
+        options_layout.addWidget(system_tray_note)
+
+        # Connect signals for checkbox interactions
+        self.system_tray_checkbox.stateChanged.connect(self.on_system_tray_changed)
+        self.auto_close_checkbox.stateChanged.connect(self.on_auto_close_changed)
 
         self.dialog.main_layout.addWidget(options_group)
+
+    def on_system_tray_changed(self):
+        # Update auto-close behavior description based on system tray state
+        pass
+
+    def on_auto_close_changed(self):
+        # Enable/disable auto-close delay spin box based on checkbox state
+        self.auto_close_delay_spin.setEnabled(self.auto_close_checkbox.isChecked())
 
     def _setup_bottom_buttons(self):
         # Create bottom buttons layout
         bottom_buttons_layout = QHBoxLayout()
 
-        # Save button
-        self.save_button = QPushButton("Save Configuration")
-        self.save_button.clicked.connect(self.dialog.save_config)
-        bottom_buttons_layout.addWidget(self.save_button)
-
-        self.dialog.main_layout.addLayout(bottom_buttons_layout)
-
-    def _setup_author_label(self):
-        # Create horizontal layout for author label
-        author_layout = QHBoxLayout()
-        author_layout.addStretch(1)  # Add stretch to push label to the right
-
-        # Create the author label
+        # Create the author label on the left
         self.author_label = QLabel("Created by Avaxerrr")
         self.author_label.setStyleSheet("color: palette(text); text-decoration: underline; cursor: pointer;")
         self.author_label.setCursor(Qt.PointingHandCursor)
@@ -202,14 +241,26 @@ class ConfiguratorUI:
         font.setItalic(True)
         self.author_label.setFont(font)
 
-        # Add label to horizontal layout
-        author_layout.addWidget(self.author_label)
+        # Add author label to the left side
+        bottom_buttons_layout.addWidget(self.author_label)
 
-        # Add horizontal layout to main layout
-        self.dialog.main_layout.addLayout(author_layout)
+        # Add stretch to push buttons to the right
+        bottom_buttons_layout.addStretch(1)
+
+        # Save button
+        self.save_button = QPushButton("Save")
+        self.save_button.clicked.connect(self.dialog.save_config)
+        bottom_buttons_layout.addWidget(self.save_button)
+
+        # Close button (doesn't save)
+        self.close_button = QPushButton("Close")
+        self.close_button.clicked.connect(self.dialog.reject)
+        bottom_buttons_layout.addWidget(self.close_button)
+
+        self.dialog.main_layout.addLayout(bottom_buttons_layout)
 
     def setup_theme(self):
-        ThemeManager.setup_theme(QApplication.instance(), self.save_button)
+        ThemeManager.setup_theme(QApplication.instance(), self.save_button, self.close_button)
 
     def show_about_dialog(self, event):
         dialog = AboutDialog(self.dialog)
