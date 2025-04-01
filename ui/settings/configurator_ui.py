@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import (QApplication, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox)
+                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox, QWidget)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 
@@ -8,6 +8,8 @@ from managers.theme_manager import ThemeManager
 from managers.startup_manager import StartupManager
 from ui.settings.ui_resources import UIResources
 from ui.about_dialog import AboutDialog
+from ui.collapsible_section import CollapsibleSection
+
 
 
 class ConfiguratorUI:
@@ -33,9 +35,20 @@ class ConfiguratorUI:
         self.delay_description.setContentsMargins(0, 0, 0, 10)
         self.dialog.main_layout.addWidget(self.delay_description)
 
+        # Setup folders section (non-collapsible)
         self._setup_folders_section()
+
+        # Setup collapsible timing section
+        self.timing_section = CollapsibleSection("Timing Settings (seconds)")
+        self.dialog.main_layout.addWidget(self.timing_section)
         self._setup_timing_section()
+
+        # Setup collapsible options section
+        self.options_section = CollapsibleSection("Launch Options")
+        self.dialog.main_layout.addWidget(self.options_section)
         self._setup_options_section()
+
+        # Setup bottom buttons
         self._setup_bottom_buttons()
 
     def _setup_folders_section(self):
@@ -82,9 +95,9 @@ class ConfiguratorUI:
         self.dialog.main_layout.addWidget(folders_group)
 
     def _setup_timing_section(self):
-        # Create timing settings group
-        timing_group = QGroupBox("Timing Settings (seconds)")
-        timing_layout = QGridLayout(timing_group)
+        # Create timing widget and layout
+        timing_widget = QWidget()
+        timing_layout = QGridLayout(timing_widget)
 
         # Explorer startup delay
         timing_layout.addWidget(QLabel("Explorer Startup Delay:"), 0, 0)
@@ -131,12 +144,13 @@ class ConfiguratorUI:
         self.after_enter_spin.setToolTip(self.tooltips["after_enter"])
         timing_layout.addWidget(self.after_enter_spin, 2, 1)
 
-        self.dialog.main_layout.addWidget(timing_group)
+        # Add the widget to the collapsible section
+        self.timing_section.add_widget(timing_widget)
 
     def _setup_options_section(self):
-        # Create options group
-        options_group = QGroupBox("Launch Options")
-        options_layout = QVBoxLayout(options_group)
+        # Create options widget and layout
+        options_widget = QWidget()
+        options_layout = QVBoxLayout(options_widget)
 
         # System Access Options section
         system_access_label = QLabel("System Access Options:")
@@ -157,7 +171,6 @@ class ConfiguratorUI:
         # Start on Windows boot checkbox
         self.start_on_boot_checkbox = QCheckBox("Start on Windows boot")
         self.start_on_boot_checkbox.setToolTip(self.tooltips["start_on_boot"])
-        # Check if startup shortcut exists and set checkbox accordingly
         self.start_on_boot_checkbox.setChecked(StartupManager.check_startup_shortcut_exists())
         options_layout.addWidget(self.start_on_boot_checkbox)
 
@@ -216,7 +229,8 @@ class ConfiguratorUI:
         self.system_tray_checkbox.stateChanged.connect(self.on_system_tray_changed)
         self.auto_close_checkbox.stateChanged.connect(self.on_auto_close_changed)
 
-        self.dialog.main_layout.addWidget(options_group)
+        # Add the widget to the collapsible section
+        self.options_section.add_widget(options_widget)
 
     def on_system_tray_changed(self):
         # Update auto-close behavior description based on system tray state

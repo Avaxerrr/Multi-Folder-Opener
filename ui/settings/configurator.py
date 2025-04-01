@@ -1,10 +1,12 @@
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QMessageBox
+from PySide6.QtGui import Qt
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QMessageBox, QScrollArea, QWidget
 import os
 
 from managers.config_manager import ConfigManager
 from managers.startup_manager import StartupManager
 from ui.settings.configurator_ui import ConfiguratorUI
 from ui.settings.configurator_handlers import ConfiguratorHandlers
+from ui.ui_components import ModernScrollBar
 from app_config import CONFIG_PATH, APP_ROOT
 
 
@@ -12,20 +14,37 @@ class ConfiguratorDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Configurator")
-        self.setMinimumSize(800, 500)
+        self.setMinimumSize(700, 500)
 
-        self.application_path = APP_ROOT  # Use the centralized app root path
-        self.config_path = CONFIG_PATH  # Use the centralized config path
+        self.application_path = APP_ROOT
+        self.config_path = CONFIG_PATH
         self.config_manager = ConfigManager(self.config_path)
 
         # Initialize folders list and sleep timers
         self.folders, self.sleep_timers, self.start_instantly, self.auto_close, self.auto_close_delay, self.system_tray, _ = self.config_manager.load_config(
             self)
 
-        # Create main layout
-        self.main_layout = QVBoxLayout(self)
+        # Create scroll area
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setVerticalScrollBar(ModernScrollBar(Qt.Vertical, self.scroll_area))
+        self.scroll_area.setHorizontalScrollBar(ModernScrollBar(Qt.Horizontal, self.scroll_area))
+
+        # Create a widget to hold the content
+        self.content_widget = QWidget()
+
+        # Create main layout for the content
+        self.main_layout = QVBoxLayout(self.content_widget)
         self.main_layout.setContentsMargins(15, 15, 15, 15)
         self.main_layout.setSpacing(10)
+
+        # Set the content widget to the scroll area
+        self.scroll_area.setWidget(self.content_widget)
+
+        # Create a layout for the dialog
+        dialog_layout = QVBoxLayout(self)
+        dialog_layout.setContentsMargins(0, 0, 0, 0)
+        dialog_layout.addWidget(self.scroll_area)
 
         # Setup UI and handlers
         self.ui = ConfiguratorUI(self)

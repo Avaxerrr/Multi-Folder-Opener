@@ -97,6 +97,13 @@ class AboutDialog(QDialog):
         launcher_credit.setAlignment(Qt.AlignCenter)
         layout.addWidget(launcher_credit)
 
+        launcher_credit = QLabel(
+            "Arrow icon created by <a href='https://www.flaticon.com/authors/creatype/glyph'>Creatype</a> from <a href='https://www.flaticon.com/'>Flaticon</a>")
+        launcher_credit.setOpenExternalLinks(True)
+        launcher_credit.setAlignment(Qt.AlignCenter)
+        layout.addWidget(launcher_credit)
+
+
         layout.addStretch()
 
         # Close button

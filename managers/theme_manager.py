@@ -126,6 +126,14 @@ class ThemeManager:
         """)
 
     @staticmethod
+    def update_collapsible_sections():
+        """Update all collapsible sections in the application"""
+        for widget in QApplication.instance().allWidgets():
+            if hasattr(widget, 'update_theme') and callable(widget.update_theme):
+                widget.update_theme()
+
+    @staticmethod
     def on_palette_changed(app, execute_button=None, cancel_button=None):
         """Handle palette change events"""
         ThemeManager.setup_theme(app, execute_button, cancel_button, True)
+        ThemeManager.update_collapsible_sections()
