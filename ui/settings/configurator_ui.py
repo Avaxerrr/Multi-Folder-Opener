@@ -100,16 +100,20 @@ class ConfiguratorUI:
         timing_layout = QGridLayout(timing_widget)
 
         # Explorer startup delay
-        timing_layout.addWidget(QLabel("Explorer Startup Delay:"), 0, 0)
+        explorer_label = QLabel("Explorer Startup Delay:")
+        explorer_label.setToolTip(self.tooltips["explorer_startup"])
+        timing_layout.addWidget(explorer_label, 0, 0)
         self.explorer_startup_spin = QDoubleSpinBox()
         self.explorer_startup_spin.setRange(0.1, 5.0)
         self.explorer_startup_spin.setSingleStep(0.1)
-        self.explorer_startup_spin.setValue(self.dialog.sleep_timers["explorer_startup"])
-        self.explorer_startup_spin.setToolTip(self.tooltips["explorer_startup"])
+        self.explorer_startup_spin.setValue(1.0)  # Example default value
+        self.explorer_startup_spin.setToolTip(self.tooltips["explorer_startup"])  # Set tooltip for the spinbox
         timing_layout.addWidget(self.explorer_startup_spin, 0, 1)
 
         # New tab delay
-        timing_layout.addWidget(QLabel("New Tab Delay:"), 0, 2)
+        new_tab_label = QLabel("New Tab Delay:")
+        new_tab_label.setToolTip(self.tooltips["new_tab"])
+        timing_layout.addWidget(new_tab_label, 0, 2)
         self.new_tab_spin = QDoubleSpinBox()
         self.new_tab_spin.setRange(0.1, 5.0)
         self.new_tab_spin.setSingleStep(0.1)
@@ -118,7 +122,9 @@ class ConfiguratorUI:
         timing_layout.addWidget(self.new_tab_spin, 0, 3)
 
         # Address bar focus delay
-        timing_layout.addWidget(QLabel("Address Bar Focus Delay:"), 1, 0)
+        address_bar_label = QLabel("Address Bar Focus Delay:")
+        address_bar_label.setToolTip(self.tooltips["address_bar_focus"])
+        timing_layout.addWidget(address_bar_label, 1, 0)
         self.address_bar_spin = QDoubleSpinBox()
         self.address_bar_spin.setRange(0.1, 5.0)
         self.address_bar_spin.setSingleStep(0.1)
@@ -127,7 +133,9 @@ class ConfiguratorUI:
         timing_layout.addWidget(self.address_bar_spin, 1, 1)
 
         # After typing delay
-        timing_layout.addWidget(QLabel("After Typing Delay:"), 1, 2)
+        after_typing_label = QLabel("After Typing Delay:")
+        after_typing_label.setToolTip(self.tooltips["after_typing"])
+        timing_layout.addWidget(after_typing_label, 1, 2)
         self.after_typing_spin = QDoubleSpinBox()
         self.after_typing_spin.setRange(0.1, 5.0)
         self.after_typing_spin.setSingleStep(0.1)
@@ -136,7 +144,9 @@ class ConfiguratorUI:
         timing_layout.addWidget(self.after_typing_spin, 1, 3)
 
         # After enter delay
-        timing_layout.addWidget(QLabel("After Enter Delay:"), 2, 0)
+        after_enter_label = QLabel("After Enter Delay:")
+        after_enter_label.setToolTip(self.tooltips["after_enter"])
+        timing_layout.addWidget(after_enter_label, 2, 0)
         self.after_enter_spin = QDoubleSpinBox()
         self.after_enter_spin.setRange(0.1, 5.0)
         self.after_enter_spin.setSingleStep(0.1)
