@@ -128,3 +128,10 @@ class ConfiguratorDialog(QDialog):
         if self.callback:
             self.callback()
         return saved
+
+    # prevent the dialog from closing when pressing esc key
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            event.ignore()
+        else:
+            super().keyPressEvent(event)
