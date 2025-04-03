@@ -55,5 +55,3 @@ This project is licensed under the MIT License - see the [LICENSE](license.md) f
 ## Acknowledgments
 
 - Launcher icon created by [3D Color](https://www.flaticon.com/authors/3d/color/) from [Flaticon](https://www.flaticon.com/)
-- Configurator icon created by [Basic Round Flat](https://www.flaticon.com/authors/basic-rounded/flat) from [Flaticon](https://www.flaticon.com/)
-
