@@ -112,7 +112,7 @@ class ConfiguratorDialog(QDialog):
                 else:
                     # Create desktop shortcut
                     from managers.shortcut_manager import ShortcutManager
-                    ShortcutManager.create_desktop_shortcut()
+                    ShortcutManager.create_start_menu_shortcuts()
 
         # Save config
         saved = self.config_manager.save_config(
