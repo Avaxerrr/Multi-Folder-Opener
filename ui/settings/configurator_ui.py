@@ -106,7 +106,7 @@ class ConfiguratorUI:
         self.explorer_startup_spin = QDoubleSpinBox()
         self.explorer_startup_spin.setRange(0.1, 5.0)
         self.explorer_startup_spin.setSingleStep(0.1)
-        self.explorer_startup_spin.setValue(1.0)  # Example default value
+        self.explorer_startup_spin.setValue(self.dialog.sleep_timers["explorer_startup"])
         self.explorer_startup_spin.setToolTip(self.tooltips["explorer_startup"])  # Set tooltip for the spinbox
         timing_layout.addWidget(self.explorer_startup_spin, 0, 1)
 
