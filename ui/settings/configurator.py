@@ -125,9 +125,6 @@ class ConfiguratorDialog(QDialog):
             system_tray=self.system_tray
         )
 
-        if saved:
-            self.accept()
-            # Call the callback function if it exists
-            if self.callback:
-                self.callback()
+        if self.callback:
+            self.callback()
         return saved
