@@ -11,10 +11,11 @@ from app_config import CONFIG_PATH, APP_ROOT
 
 
 class ConfiguratorDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, callback=None):
         super().__init__(parent)
         self.setWindowTitle("Configurator")
         self.setMinimumSize(700, 500)
+        self.callback = callback  # Store the callback function
 
         self.application_path = APP_ROOT
         self.config_path = CONFIG_PATH
@@ -126,6 +127,7 @@ class ConfiguratorDialog(QDialog):
 
         if saved:
             self.accept()
-
+            # Call the callback function if it exists
+            if self.callback:
+                self.callback()
         return saved
-

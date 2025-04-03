@@ -5,12 +5,13 @@ import sys
 
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication, QMainWindow
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QCloseEvent
 
 from managers.log_manager import LogManager
 from managers.dialog_manager import DialogManager
 from managers.command_line_handler import CommandLineHandler
 from managers.config_manager import ConfigManager
+from managers.systemtray_manager import SystemTrayManager
 from managers.theme_manager import ThemeManager
 from managers.folder_opening_manager import FolderOpeningManager
 from ui.main_window_ui import MainWindowUI
@@ -52,6 +53,10 @@ class FolderOpenerExecutionApp(QMainWindow):
         # Initialize UI
         self.ui_manager = MainWindowUI(self, self.icon)
         ui_components = self.ui_manager.setup_ui()
+
+        # Initialize system tray manager
+        self.systemtray_manager = SystemTrayManager(self, self, self.dialog_manager)
+        self.systemtray_manager.toggle_tray_icon(self.system_tray)
 
         # Set log widget for logger
         self.log_manager.set_log_widget(ui_components['log_text'])
@@ -96,6 +101,10 @@ class FolderOpenerExecutionApp(QMainWindow):
         self.theme_timer.timeout.connect(self.check_theme)
         self.theme_timer.start(2000)
 
+        # Show system tray icon if enabled
+        if self.system_tray:
+            self.systemtray_manager.show_tray_icon()
+
         # Auto-start if configured
         if self.start_instantly:
             self.log_manager.info("Auto-execution enabled in config. Starting folder opening process...")
@@ -104,6 +113,16 @@ class FolderOpenerExecutionApp(QMainWindow):
         # Show welcome dialog for first run
         if self.is_first_run:
             self.dialog_manager.show_welcome_dialog()
+
+    def closeEvent(self, event: QCloseEvent):
+        """Override close event to handle system tray behavior"""
+        if self.system_tray:
+            self.log_manager.info("System tray enabled. Hiding to system tray instead of closing.")
+            event.ignore()
+            self.hide_to_system_tray()
+        else:
+            self.log_manager.info("Closing application.")
+            event.accept()
 
     def load_config(self):
         """Load configuration from config manager"""
@@ -118,6 +137,8 @@ class FolderOpenerExecutionApp(QMainWindow):
             self.auto_close,
             self.auto_close_delay
         )
+        self.systemtray_manager.toggle_tray_icon(self.system_tray)
+        self.systemtray_manager.update_menu_state()
         self.log_manager.info("Configuration reloaded.")
 
     def on_palette_changed(self, palette):
@@ -179,12 +200,15 @@ class FolderOpenerExecutionApp(QMainWindow):
     def hide_to_system_tray(self):
         """Hide the main window to system tray"""
         self.log_manager.info("Hiding to system tray.")
-        self.parent.hide()
+        self.systemtray_manager.minimize_to_tray()
 
     def close_application(self):
         """Close the application"""
         self.log_manager.info("Closing application.")
-        self.parent.close()
+        if self.system_tray:
+            self.systemtray_manager.exit_application()
+        else:
+            self.close()
 
 
 if __name__ == "__main__":
