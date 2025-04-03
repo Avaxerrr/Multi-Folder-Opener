@@ -5,7 +5,6 @@ import sys
 import pythoncom
 import win32com.client
 from PySide6.QtWidgets import QMessageBox
-from app_config import APP_ROOT
 
 
 class StartupManager:
@@ -31,44 +30,31 @@ class StartupManager:
 
     @staticmethod
     def create_startup_shortcut(parent_widget=None):
-        """Create a shortcut in the Windows Startup folder"""
         try:
-            # Initialize COM
-            pythoncom.CoInitialize()
-
-            # Get the path to the executable or script
+            # Get paths exactly like desktop shortcut
             if getattr(sys, 'frozen', False):
-                # Running as executable
-                target_path = os.path.join(APP_ROOT, "launcher.exe") # need to change for the final executable name
+                # Running as compiled executable
+                app_path = sys.executable
             else:
                 # Running as script
-                target_path = os.path.join(APP_ROOT, "main_launcher.py")
-                # For scripts, we need to use the Python interpreter
-                if not os.path.exists(target_path):
-                    if parent_widget:
-                        QMessageBox.warning(parent_widget, "Warning",
-                                            "Could not find the launcher. Startup on boot may not work.")
-                    return False
+                app_path = os.path.abspath(sys.argv[0])
+
+            if not os.path.exists(app_path):
+                if parent_widget:
+                    QMessageBox.warning(parent_widget, "Warning",
+                                        "Could not find the launcher. Startup on boot may not work.")
+                return False
 
             # Create shortcut object
             startup_folder = StartupManager.get_startup_folder_path()
             shortcut_path = os.path.join(startup_folder, "Folder Opener.lnk")
 
-            # Create the shortcut
+            # Create the shortcut exactly like desktop shortcut
             shell = win32com.client.Dispatch("WScript.Shell")
             shortcut = shell.CreateShortCut(shortcut_path)
-
-            if getattr(sys, 'frozen', False):
-                # For executable
-                shortcut.Targetpath = target_path
-                shortcut.WorkingDirectory = APP_ROOT
-            else:
-                # For script
-                shortcut.Targetpath = sys.executable
-                shortcut.Arguments = f'"{target_path}"'
-                shortcut.WorkingDirectory = APP_ROOT
-
-            shortcut.IconLocation = os.path.join(APP_ROOT, 'icons', 'launcher.ico')
+            shortcut.Targetpath = app_path
+            shortcut.WorkingDirectory = os.path.dirname(app_path)
+            shortcut.IconLocation = app_path
             shortcut.Description = "Folder Opener Launcher"
             shortcut.save()
 
@@ -76,9 +62,8 @@ class StartupManager:
         except Exception as e:
             if parent_widget:
                 QMessageBox.critical(parent_widget, "Error", f"Could not create startup shortcut: {str(e)}")
+            print(f"Error creating startup shortcut: {e}")  # Add this for debugging
             return False
-        finally:
-            pythoncom.CoUninitialize()
 
     @staticmethod
     def remove_startup_shortcut(parent_widget=None):
