@@ -49,7 +49,7 @@ class ConfiguratorUI:
     def create_header(self):
         header_widget = QWidget()
         header_layout = QVBoxLayout(header_widget)
-        header_layout.setContentsMargins(10, 10, 10, 5)
+        header_layout.setContentsMargins(15, 10, 15, 15)
 
         title_label = QLabel("Configure Folders and Launch Settings")
         font = QFont()
@@ -58,8 +58,7 @@ class ConfiguratorUI:
         title_label.setFont(font)
         header_layout.addWidget(title_label)
 
-        description_label = QLabel("Adjust delay settings based on your system performance. "
-                                   "Longer delays help ensure folders open properly without errors on slower systems.")
+        description_label = QLabel("Configure your folder paths and application behavior below. ")
         description_label.setWordWrap(True)
         header_layout.addWidget(description_label)
 
@@ -81,6 +80,21 @@ class ConfiguratorUI:
 
     def setup_folders_section(self, parent_layout):
         folders_group = QGroupBox("Folders to Open")
+
+        folders_group.setStyleSheet("""
+            QGroupBox {
+                margin-top: 10px;  /* Space above the title */
+                font-weight: bold;
+                padding-left: 10px;  /* Left padding for the title */
+                padding-right: 10px;  /* Right padding for the title */
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 7px;  /* Position of the title */
+                padding: 0px 5px 0px 5px;  /* Padding around the title text */
+            }
+        """)
+
         folders_layout = QVBoxLayout(folders_group)
 
         # Reduce the margins to minimize extra space
@@ -147,62 +161,74 @@ class ConfiguratorUI:
     def setup_timing_section(self):
         # Create timing widget and layout
         timing_widget = QWidget()
-        timing_layout = QGridLayout(timing_widget)
+        timing_layout = QVBoxLayout(timing_widget)  # Change to QVBoxLayout
+
+        # Add description specific to timing
+        delay_description = QLabel("Adjust delay settings based on your system performance. "
+                                   "Longer delays help ensure folders open properly without errors on slower systems.")
+        delay_description.setWordWrap(True)
+        delay_description.setStyleSheet("color: #666666; font-style: italic;")
+        timing_layout.addWidget(delay_description)
+
+        # Create grid for timing controls
+        timing_controls = QGridLayout()
+        timing_controls.setHorizontalSpacing(25)  # Add horizontal spacing between columns
+        timing_layout.addLayout(timing_controls)  # Add grid to the main vertical layout
 
         # Explorer startup delay
         explorer_label = QLabel("Explorer Startup Delay:")
         explorer_label.setToolTip(self.tooltips["explorer_startup"])
-        timing_layout.addWidget(explorer_label, 0, 0)
+        timing_controls.addWidget(explorer_label, 0, 0)  # Use timing_controls instead
         self.explorer_startup_spin = QDoubleSpinBox()
         self.explorer_startup_spin.setRange(0.1, 5.0)
         self.explorer_startup_spin.setSingleStep(0.1)
         self.explorer_startup_spin.setValue(self.dialog.sleep_timers["explorer_startup"])
         self.explorer_startup_spin.setToolTip(self.tooltips["explorer_startup"])
-        timing_layout.addWidget(self.explorer_startup_spin, 0, 1)
+        timing_controls.addWidget(self.explorer_startup_spin, 0, 1)  # Use timing_controls
 
         # New tab delay
         new_tab_label = QLabel("New Tab Delay:")
         new_tab_label.setToolTip(self.tooltips["new_tab"])
-        timing_layout.addWidget(new_tab_label, 0, 2)
+        timing_controls.addWidget(new_tab_label, 0, 2)
         self.new_tab_spin = QDoubleSpinBox()
         self.new_tab_spin.setRange(0.1, 5.0)
         self.new_tab_spin.setSingleStep(0.1)
         self.new_tab_spin.setValue(self.dialog.sleep_timers["new_tab"])
         self.new_tab_spin.setToolTip(self.tooltips["new_tab"])
-        timing_layout.addWidget(self.new_tab_spin, 0, 3)
+        timing_controls.addWidget(self.new_tab_spin, 0, 3)
 
         # Address bar focus delay
         address_bar_label = QLabel("Address Bar Focus Delay:")
         address_bar_label.setToolTip(self.tooltips["address_bar_focus"])
-        timing_layout.addWidget(address_bar_label, 1, 0)
+        timing_controls.addWidget(address_bar_label, 1, 0)
         self.address_bar_spin = QDoubleSpinBox()
         self.address_bar_spin.setRange(0.1, 5.0)
         self.address_bar_spin.setSingleStep(0.1)
         self.address_bar_spin.setValue(self.dialog.sleep_timers["address_bar_focus"])
         self.address_bar_spin.setToolTip(self.tooltips["address_bar_focus"])
-        timing_layout.addWidget(self.address_bar_spin, 1, 1)
+        timing_controls.addWidget(self.address_bar_spin, 1, 1)
 
         # After typing delay
         after_typing_label = QLabel("After Typing Delay:")
         after_typing_label.setToolTip(self.tooltips["after_typing"])
-        timing_layout.addWidget(after_typing_label, 1, 2)
+        timing_controls.addWidget(after_typing_label, 1, 2)
         self.after_typing_spin = QDoubleSpinBox()
         self.after_typing_spin.setRange(0.1, 5.0)
         self.after_typing_spin.setSingleStep(0.1)
         self.after_typing_spin.setValue(self.dialog.sleep_timers["after_typing"])
         self.after_typing_spin.setToolTip(self.tooltips["after_typing"])
-        timing_layout.addWidget(self.after_typing_spin, 1, 3)
+        timing_controls.addWidget(self.after_typing_spin, 1, 3)
 
         # After enter delay
         after_enter_label = QLabel("After Enter Delay:")
         after_enter_label.setToolTip(self.tooltips["after_enter"])
-        timing_layout.addWidget(after_enter_label, 2, 0)
+        timing_controls.addWidget(after_enter_label, 2, 0)
         self.after_enter_spin = QDoubleSpinBox()
         self.after_enter_spin.setRange(0.1, 5.0)
         self.after_enter_spin.setSingleStep(0.1)
         self.after_enter_spin.setValue(self.dialog.sleep_timers["after_enter"])
         self.after_enter_spin.setToolTip(self.tooltips["after_enter"])
-        timing_layout.addWidget(self.after_enter_spin, 2, 1)
+        timing_controls.addWidget(self.after_enter_spin, 2, 1)
 
         # Add the widget to the collapsible section
         self.timing_section.add_widget(timing_widget)
