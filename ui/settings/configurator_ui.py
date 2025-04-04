@@ -83,9 +83,16 @@ class ConfiguratorUI:
         folders_group = QGroupBox("Folders to Open")
         folders_layout = QVBoxLayout(folders_group)
 
+        # Reduce the margins to minimize extra space
+        folders_layout.setContentsMargins(5, 5, 5, 5)
+        folders_layout.setSpacing(5)  # Reduce spacing between elements
+
         # Create list widget for folders
         self.folders_list = ModernListWidget()
         self.folders_list.setSelectionMode(ModernListWidget.SelectionMode.ExtendedSelection)
+
+        # Set a smaller height for the list itself
+        self.folders_list.setFixedHeight(170)
         FolderOperations.update_folders_list(self.folders_list, self.dialog.folders)
         folders_layout.addWidget(self.folders_list)
 
@@ -93,6 +100,9 @@ class ConfiguratorUI:
         self.folders_list.itemChanged.connect(self.dialog.handlers.on_folder_edited)
         self.folders_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self.folders_list.customContextMenuRequested.connect(self.dialog.handlers.show_folder_context_menu)
+
+        # Add keyboard shortcut for delete
+        self.folders_list.keyPressEvent = self.folder_list_key_press
 
         # Create folder buttons layout
         folder_buttons_layout = QHBoxLayout()
@@ -118,7 +128,21 @@ class ConfiguratorUI:
         folder_buttons_layout.addWidget(self.move_down_button)
 
         folders_layout.addLayout(folder_buttons_layout)
+
+        # Set a fixed height for the entire group box of the folder list view
+        folders_group.setFixedHeight(235)
+
         parent_layout.addWidget(folders_group)
+
+    # delete keys for folder view list
+    def folder_list_key_press(self, event):
+        # Check if Delete key was pressed
+        if event.key() == Qt.Key_Delete:
+            # Call the remove folder method
+            self.dialog.handlers.remove_folder()
+        else:
+            # Call the original keyPressEvent method for other keys
+            ModernListWidget.keyPressEvent(self.folders_list, event)
 
     def setup_timing_section(self):
         # Create timing widget and layout

@@ -1,7 +1,8 @@
 # configurator.py
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QMessageBox
+from PySide6.QtGui import QShortcut, QKeySequence, QUndoStack
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QMessageBox, QSizePolicy, QLayout
 import os
 
 from managers.config_manager import ConfigManager
@@ -9,13 +10,14 @@ from managers.startup_manager import StartupManager
 from ui.settings.configurator_ui import ConfiguratorUI
 from ui.settings.configurator_handlers import ConfiguratorHandlers
 from app_config import CONFIG_PATH, APP_ROOT
+import ui.settings.undo_commands
 
 
 class ConfiguratorDialog(QDialog):
     def __init__(self, parent=None, callback=None):
         super().__init__(parent)
         self.setWindowTitle("Configurator")
-        self.setMinimumSize(700, 500)
+        self.setFixedSize(700, 475)
         self.callback = callback  # Store the callback function
 
         self.application_path = APP_ROOT
@@ -38,6 +40,17 @@ class ConfiguratorDialog(QDialog):
         # Setup UI components
         self.ui.setup_ui()
         self.ui.setup_theme()
+
+        # Initialize undo stack
+        self.undo_stack = QUndoStack(self)
+
+        # Create undo shortcuts
+        self.undo_shortcut = QShortcut(QKeySequence.Undo, self)
+        self.undo_shortcut.activated.connect(self.undo_stack.undo)
+
+        # Create redo shortcuts
+        self.redo_shortcut = QShortcut(QKeySequence.Redo, self)
+        self.redo_shortcut.activated.connect(self.undo_stack.redo)
 
     def save_config(self):
         # Update sleep timers from UI
