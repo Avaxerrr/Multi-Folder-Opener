@@ -1,15 +1,18 @@
+# configurator_ui.py
+
 from PySide6.QtWidgets import (QApplication, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox, QWidget)
+                               QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox, QWidget,
+                               QScrollArea)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 
-from ui.ui_components import ModernListWidget
+from ui.ui_components import ModernListWidget, ModernScrollBar
 from managers.theme_manager import ThemeManager
 from managers.startup_manager import StartupManager
 from ui.settings.ui_resources import UIResources
 from ui.about_dialog import AboutDialog
 from ui.collapsible_section import CollapsibleSection
-
+from core.folder_operations import FolderOperations
 
 
 class ConfiguratorUI:
@@ -18,52 +21,75 @@ class ConfiguratorUI:
         self.tooltips = UIResources.tooltips
 
     def setup_ui(self):
-        # Header label
-        self.header_label = QLabel("Configure Folders and Launch Settings")
+        # Header
+        header_widget = self.create_header()
+        self.dialog.main_layout.addWidget(header_widget)
+
+        # Scrollable content
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFrameShape(QScrollArea.NoFrame)
+
+        # Add modern scrollbars
+        scroll_area.setVerticalScrollBar(ModernScrollBar(Qt.Vertical, scroll_area))
+        scroll_area.setHorizontalScrollBar(ModernScrollBar(Qt.Horizontal, scroll_area))
+
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        content_layout.setContentsMargins(10, 5, 10, 5)
+        content_layout.setSpacing(10)
+        self.setup_content(content_layout)
+        scroll_area.setWidget(content_widget)
+        self.dialog.main_layout.addWidget(scroll_area, 1)  # Add stretch factor
+
+        # Footer
+        footer_widget = self.create_footer()
+        self.dialog.main_layout.addWidget(footer_widget)
+
+    def create_header(self):
+        header_widget = QWidget()
+        header_layout = QVBoxLayout(header_widget)
+        header_layout.setContentsMargins(10, 10, 10, 5)
+
+        title_label = QLabel("Configure Folders and Launch Settings")
         font = QFont()
         font.setPointSize(12)
         font.setBold(True)
-        self.header_label.setFont(font)
-        self.header_label.setContentsMargins(0, 0, 0, 10)
-        self.dialog.main_layout.addWidget(self.header_label)
+        title_label.setFont(font)
+        header_layout.addWidget(title_label)
 
-        # Subheader/description for delay settings
-        self.delay_description = QLabel(
-            "Adjust delay settings based on your system performance. "
-            "Longer delays help ensure folders open properly without errors on slower systems.")
-        self.delay_description.setWordWrap(True)
-        self.delay_description.setContentsMargins(0, 0, 0, 10)
-        self.dialog.main_layout.addWidget(self.delay_description)
+        description_label = QLabel("Adjust delay settings based on your system performance. "
+                                   "Longer delays help ensure folders open properly without errors on slower systems.")
+        description_label.setWordWrap(True)
+        header_layout.addWidget(description_label)
 
-        # Setup folders section (non-collapsible)
-        self._setup_folders_section()
+        return header_widget
 
-        # Setup collapsible timing section
+    def setup_content(self, layout):
+        # Folders section
+        self.setup_folders_section(layout)
+
+        # Timing settings section
         self.timing_section = CollapsibleSection("Timing Settings (seconds)")
-        self.dialog.main_layout.addWidget(self.timing_section)
-        self._setup_timing_section()
+        self.setup_timing_section()
+        layout.addWidget(self.timing_section)
 
-        # Setup collapsible options section
+        # Launch options section
         self.options_section = CollapsibleSection("Launch Options")
-        self.dialog.main_layout.addWidget(self.options_section)
-        self._setup_options_section()
+        self.setup_options_section()
+        layout.addWidget(self.options_section)
 
-        # Setup bottom buttons
-        self._setup_bottom_buttons()
-
-    def _setup_folders_section(self):
-        # Create folders group
+    def setup_folders_section(self, parent_layout):
         folders_group = QGroupBox("Folders to Open")
         folders_layout = QVBoxLayout(folders_group)
 
-        # Create list widget for folders with modern scrollbar
+        # Create list widget for folders
         self.folders_list = ModernListWidget()
         self.folders_list.setSelectionMode(ModernListWidget.SelectionMode.ExtendedSelection)
-        from core.folder_operations import FolderOperations
         FolderOperations.update_folders_list(self.folders_list, self.dialog.folders)
         folders_layout.addWidget(self.folders_list)
 
-        # editable view list
+        # Set up folder list behavior
         self.folders_list.itemChanged.connect(self.dialog.handlers.on_folder_edited)
         self.folders_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self.folders_list.customContextMenuRequested.connect(self.dialog.handlers.show_folder_context_menu)
@@ -92,9 +118,9 @@ class ConfiguratorUI:
         folder_buttons_layout.addWidget(self.move_down_button)
 
         folders_layout.addLayout(folder_buttons_layout)
-        self.dialog.main_layout.addWidget(folders_group)
+        parent_layout.addWidget(folders_group)
 
-    def _setup_timing_section(self):
+    def setup_timing_section(self):
         # Create timing widget and layout
         timing_widget = QWidget()
         timing_layout = QGridLayout(timing_widget)
@@ -107,7 +133,7 @@ class ConfiguratorUI:
         self.explorer_startup_spin.setRange(0.1, 5.0)
         self.explorer_startup_spin.setSingleStep(0.1)
         self.explorer_startup_spin.setValue(self.dialog.sleep_timers["explorer_startup"])
-        self.explorer_startup_spin.setToolTip(self.tooltips["explorer_startup"])  # Set tooltip for the spinbox
+        self.explorer_startup_spin.setToolTip(self.tooltips["explorer_startup"])
         timing_layout.addWidget(self.explorer_startup_spin, 0, 1)
 
         # New tab delay
@@ -157,7 +183,7 @@ class ConfiguratorUI:
         # Add the widget to the collapsible section
         self.timing_section.add_widget(timing_widget)
 
-    def _setup_options_section(self):
+    def setup_options_section(self):
         # Create options widget and layout
         options_widget = QWidget()
         options_layout = QVBoxLayout(options_widget)
@@ -242,19 +268,11 @@ class ConfiguratorUI:
         # Add the widget to the collapsible section
         self.options_section.add_widget(options_widget)
 
-    def on_system_tray_changed(self):
-        # Update auto-close behavior description based on system tray state
-        pass
+    def create_footer(self):
+        footer_widget = QWidget()
+        footer_layout = QHBoxLayout(footer_widget)
+        footer_layout.setContentsMargins(10, 5, 10, 10)
 
-    def on_auto_close_changed(self):
-        # Enable/disable auto-close delay spin box based on checkbox state
-        self.auto_close_delay_spin.setEnabled(self.auto_close_checkbox.isChecked())
-
-    def _setup_bottom_buttons(self):
-        # Create bottom buttons layout
-        bottom_buttons_layout = QHBoxLayout()
-
-        # Create the author label on the left
         self.author_label = QLabel("Created by Avaxerrr")
         self.author_label.setStyleSheet("color: palette(text); text-decoration: underline; cursor: pointer;")
         self.author_label.setCursor(Qt.PointingHandCursor)
@@ -266,22 +284,30 @@ class ConfiguratorUI:
         self.author_label.setFont(font)
 
         # Add author label to the left side
-        bottom_buttons_layout.addWidget(self.author_label)
+        footer_layout.addWidget(self.author_label)
 
         # Add stretch to push buttons to the right
-        bottom_buttons_layout.addStretch(1)
+        footer_layout.addStretch(1)
 
         # Save button
         self.save_button = QPushButton("Save")
         self.save_button.clicked.connect(self.dialog.save_config)
-        bottom_buttons_layout.addWidget(self.save_button)
+        footer_layout.addWidget(self.save_button)
 
         # Close button (doesn't save)
         self.close_button = QPushButton("Close")
         self.close_button.clicked.connect(self.dialog.reject)
-        bottom_buttons_layout.addWidget(self.close_button)
+        footer_layout.addWidget(self.close_button)
 
-        self.dialog.main_layout.addLayout(bottom_buttons_layout)
+        return footer_widget
+
+    def on_system_tray_changed(self):
+        # Update auto-close behavior description based on system tray state
+        pass
+
+    def on_auto_close_changed(self):
+        # Enable/disable auto-close delay spin box based on checkbox state
+        self.auto_close_delay_spin.setEnabled(self.auto_close_checkbox.isChecked())
 
     def setup_theme(self):
         ThemeManager.setup_theme(QApplication.instance(), self.save_button, self.close_button)

@@ -9,7 +9,7 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("About Multi Folder Opener")
-        self.setFixedSize(450, 520)  # Slightly increased height for better spacing
+        self.setFixedSize(450, 540)  # Slightly increased height for better spacing
 
         # Main layout with margins
         layout = QVBoxLayout()
