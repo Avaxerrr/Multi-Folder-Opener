@@ -1,12 +1,11 @@
-Here's an updated README for the Multi Folder Opener, incorporating the version 1.1 mention and reflecting the latest features:
-
 # Multi Folder Opener
 
 A Windows utility that streamlines your workflow by opening multiple folders simultaneously in Windows Explorer tabs. Version 1.1.0
 
-| Configurator | Launcher |
+| | |
 |---------|---------|
-| <img src="https://github.com/user-attachments/assets/378d4439-886b-448b-95d9-03d40569db26" width="100%"> | <img src="https://github.com/user-attachments/assets/f7918855-0c48-4843-84cd-39602b739d42" width="100%"> |
+| <img src="https://github.com/user-attachments/assets/4fc7e7f6-e6cd-4387-9f22-6fd8e28e2dac" width="100%"> | <img src="https://github.com/user-attachments/assets/abc4c7eb-f366-46b1-b1bf-51f16841b89c"> |
+|<img src="https://github.com/user-attachments/assets/5546758a-f65f-482a-835a-a5db0b5dd329" width="100%">|<img src="https://github.com/user-attachments/assets/93536ecc-2f9c-45b5-a6af-cfcc09ef2ac4" width="100%">|
 
 
 ## Features
@@ -52,6 +51,20 @@ The Launcher opens your configured folders in Windows Explorer:
 3. Progress is displayed in real-time with detailed logging
 
 **Note**: Do not interact with your computer during the folder opening process to prevent interruptions.
+
+You're absolutely right. I've revised the section to make more logical sense:
+
+## Important Note
+
+Some antivirus programs may flag this application as a false positive. This is a common occurrence for Python applications packaged into executables. Rest assured, the application is completely safe to use.
+
+If you have any concerns about security, you can review the source code or download it and compile it yourself using the following Nuitka command:
+
+```
+python -m nuitka --standalone(you can use --onefile) --enable-plugin=pyside6 --windows-icon-from-ico=icons/launcher.ico --include-data-dir=icons=icons --follow-imports --lto=yes --windows-console-mode=disable --msvc=latest --output-filename=launcher main_launcher.py
+```
+
+False positives occur because antivirus software can be suspicious of executable packers like those used by Nuitka, but this doesn't indicate any actual security risk.
 
 ## License
 
