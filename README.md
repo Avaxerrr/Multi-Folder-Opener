@@ -1,70 +1,78 @@
-# Multi Folder Opener
+# Multi Folder Opener: Streamline Your Windows File Navigation
 
-A Windows utility that streamlines your workflow by opening multiple folders simultaneously in Windows Explorer tabs. Version 1.1.0
+A powerful Windows productivity tool that opens multiple folders simultaneously in Windows Explorer tabs, saving time and eliminating repetitive navigation tasks. Version 1.1.0
 
-| | |
-|---------|---------|
-| <img src="https://github.com/user-attachments/assets/4fc7e7f6-e6cd-4387-9f22-6fd8e28e2dac" width="100%"> | <img src="https://github.com/user-attachments/assets/abc4c7eb-f366-46b1-b1bf-51f16841b89c"> |
-|<img src="https://github.com/user-attachments/assets/5546758a-f65f-482a-835a-a5db0b5dd329" width="100%">|<img src="https://github.com/user-attachments/assets/93536ecc-2f9c-45b5-a6af-cfcc09ef2ac4" width="100%">|
+<table>
+  <tr>
+    <td colspan="2" align="center"><strong>Multi Folder Opener Interfaces</strong></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/4fc7e7f6-e6cd-4387-9f22-6fd8e28e2dac" width="100%"></td>
+    <td><img src="https://github.com/user-attachments/assets/abc4c7eb-f366-46b1-b1bf-51f16841b89c"></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/5546758a-f65f-482a-835a-a5db0b5dd329" width="100%"></td>
+    <td><img src="https://github.com/user-attachments/assets/93536ecc-2f9c-45b5-a6af-cfcc09ef2ac4" width="100%"></td>
+  </tr>
+</table>
 
 
-## Features
 
-- **Open Multiple Folders**: Launch multiple folders in Windows Explorer tabs with a single click
-- **Configurable Delays**: Adjust timing settings to accommodate different system speeds
-- **Editable Folder Paths**: Easily add, remove, and reorder folders
-- **Auto-Start Option**: Configure the application to start opening folders immediately upon launch
-- **Auto-Close Option**: Automatically close the launcher after folders are opened
-- **Theme Support**: Automatically adapts to Windows light/dark theme settings
-- **Keyboard Shortcuts**: Use Delete to remove folders, Ctrl+Z to undo actions and Ctrl+Y to redo
-- **Right-Click Context Menu**: Manage folders with a convenient context menu
-- **System Tray Integration**: Easy access from the system tray
+## Productivity-Enhancing Features
 
-## Installation
+- **Instant Multi-Folder Access**: Open all your frequently used folders in Windows Explorer tabs with one click
+- **Customizable Timing Settings**: Fine-tune delay settings to optimize performance on any system
+- **Flexible Folder Management**: Easily add, remove, reorder, and edit your folder paths
+- **Workflow Automation**: Configure auto-start to begin folder opening immediately upon launch
+- **Efficiency Options**: Enable auto-close to streamline your workflow further
+- **Windows Theme Integration**: Seamlessly adapts to your Windows light/dark theme preferences
+- **Productivity Shortcuts**: Boost efficiency with keyboard shortcuts (Delete, Ctrl+Z, Ctrl+Y)
+- **Advanced Context Menu**: Right-click for quick folder management options
+- **Quick Access**: Convenient system tray integration for easy launching
+
+## Quick Start Guide
 
 1. Download the latest release from the [Releases](https://github.com/Avaxerrr/Multi-Folder-Opener/releases) page
-2. Extract the zip file to your preferred location
-3. Run `launcher.exe` to start the application
+2. Extract to any location - no installation required
+3. Run `launcher.exe` to begin optimizing your workflow
 
-No installation is required - the application is portable and can be run from any location.
+This portable application works from any location without installation requirements.
 
-## Usage
+## How to Use
 
-### Configurator
+### Configurator: Set Up Your Workflow
 
-The Configurator allows you to set up your folder paths and application settings:
+The intuitive Configurator helps you customize your folder navigation experience:
 
-1. Click "Add Folders" to select folders you want to open
-2. Arrange folders in the desired order using the Up/Down buttons or drag-and-drop
-3. Adjust delay settings based on your system performance
-4. Toggle auto-start and auto-close options as needed
-5. Click "Save" to store your settings
+1. Click "Add Folders" to select your frequently accessed directories
+2. Organize folders in your preferred order using drag-and-drop or arrow buttons
+3. Optimize performance by adjusting timing settings for your system
+4. Enable auto-start and auto-close options for maximum efficiency
+5. Save your configuration with a single click
 
-You can edit folder paths directly by double-clicking on them in the list or using the right-click context menu.
+Easily edit paths by double-clicking or using the convenient right-click context menu.
 
-### Launcher
+### Launcher: Boost Your Productivity
 
-The Launcher opens your configured folders in Windows Explorer:
+The streamlined Launcher opens all your folders with minimal effort:
 
-1. Click "Execute Folder Opening" to start the process
-2. The application will open Windows Explorer and navigate to each folder
-3. Progress is displayed in real-time with detailed logging
+1. Click "Execute Folder Opening" to initiate the process
+2. Watch as Windows Explorer opens with all your folders in organized tabs
+3. Monitor real-time progress with detailed status updates
 
-**Note**: Do not interact with your computer during the folder opening process to prevent interruptions.
+**Pro Tip**: For optimal performance, avoid interacting with your computer during the folder opening sequence.
 
-You're absolutely right. I've revised the section to make more logical sense:
+## Important Security Information
 
-## Important Note
+Some antivirus programs may flag this application as a false positive - a common occurrence with Python applications compiled into executables. The application is completely safe to use.
 
-Some antivirus programs may flag this application as a false positive. This is a common occurrence for Python applications packaged into executables. Rest assured, the application is completely safe to use.
-
-If you have any concerns about security, you can review the source code or download it and compile it yourself using the following Nuitka command:
+For additional peace of mind, you can review the source code or compile it yourself using this Nuitka command:
 
 ```
-python -m nuitka --standalone(you can use --onefile) --enable-plugin=pyside6 --windows-icon-from-ico=icons/launcher.ico --include-data-dir=icons=icons --follow-imports --lto=yes --windows-console-mode=disable --msvc=latest --output-filename=launcher main_launcher.py
+python -m nuitka --standalone --enable-plugin=pyside6 --windows-icon-from-ico=icons/launcher.ico --include-data-dir=icons=icons --follow-imports --lto=yes --windows-console-mode=disable --msvc=latest --output-filename=launcher main_launcher.py
 ```
 
-False positives occur because antivirus software can be suspicious of executable packers like those used by Nuitka, but this doesn't indicate any actual security risk.
+These false positives occur due to how antivirus software evaluates executable packers like Nuitka, not because of any actual security risk.
 
 ## License
 
