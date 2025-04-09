@@ -1,4 +1,6 @@
-# config_manager.py (new)
+# config_manager.py
+
+"""Version 1.1"""
 
 import os
 import json

@@ -1,5 +1,7 @@
 # theme_manager.py
 
+"""Version 1.1"""
+
 import darkdetect
 from PySide6.QtWidgets import QApplication, QPushButton
 from PySide6.QtGui import QPalette, QColor, Qt

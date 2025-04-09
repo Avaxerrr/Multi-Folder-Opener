@@ -1,5 +1,7 @@
 # folder_operations.py
 
+"""Version 1.1"""
+
 import os
 
 import pyautogui

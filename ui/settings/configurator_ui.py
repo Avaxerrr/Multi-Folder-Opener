@@ -1,5 +1,7 @@
 # configurator_ui.py
 
+"""Version 1.1"""
+
 from PySide6.QtWidgets import (QApplication, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
                                QDoubleSpinBox, QGridLayout, QGroupBox, QCheckBox, QWidget,
                                QScrollArea)

@@ -1,5 +1,7 @@
 # undo_commands.py
 
+"""Version 1.1"""
+
 from PySide6.QtGui import QUndoCommand
 from core.folder_operations import FolderOperations
 

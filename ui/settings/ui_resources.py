@@ -1,5 +1,7 @@
 # ui_resources.py
 
+"""Version 1.1"""
+
 class UIResources:
     tooltips = {
         "explorer_startup": (

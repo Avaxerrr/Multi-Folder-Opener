@@ -1,5 +1,6 @@
 # collapsible_section.py
 
+"""Version 1.1"""
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QApplication, QCheckBox, QDoubleSpinBox
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QEvent

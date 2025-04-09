@@ -1,5 +1,7 @@
 # ui_components.py
 
+"""Version 1.1"""
+
 from PySide6.QtWidgets import QScrollBar, QListWidget, QTextEdit, QPushButton, QProgressBar, QAbstractItemView
 from PySide6.QtCore import Qt
 

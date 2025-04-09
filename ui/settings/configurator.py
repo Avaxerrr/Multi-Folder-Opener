@@ -1,5 +1,7 @@
 # configurator.py (new)
 
+"""Version 1.1"""
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QShortcut, QKeySequence, QUndoStack
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QMessageBox, QSizePolicy, QLayout

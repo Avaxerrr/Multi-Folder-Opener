@@ -1,4 +1,6 @@
-# main_launcher.py (new)
+# main_launcher.py
+
+"""Version 1.1"""
 
 import os
 import sys

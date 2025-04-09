@@ -1,5 +1,7 @@
 # main_window_ui.py
 
+"""Version 1.1"""
+
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont

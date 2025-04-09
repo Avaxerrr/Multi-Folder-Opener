@@ -1,5 +1,7 @@
 # configurator_handlers.py
 
+"""Version 1.1"""
+
 import os
 import subprocess
 from PySide6.QtWidgets import QMessageBox, QMenu, QFileDialog

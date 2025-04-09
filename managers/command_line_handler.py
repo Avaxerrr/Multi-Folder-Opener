@@ -1,5 +1,7 @@
 # command_line_handler.py
 
+"""Version 1.1"""
+
 import sys
 
 class CommandLineHandler:

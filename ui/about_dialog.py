@@ -1,5 +1,7 @@
 # about_dialog.py
 
+"""Version 1.1"""
+
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QFrame
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
@@ -9,7 +11,7 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("About Multi Folder Opener")
-        self.setFixedSize(450, 570)  # Slightly increased height for better spacing
+        self.setFixedSize(450, 600)  # Slightly increased height for better spacing
 
         # Main layout with margins
         layout = QVBoxLayout()

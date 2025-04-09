@@ -1,5 +1,7 @@
 # log_manager.py
 
+"""Version 1.1"""
+
 import logging
 from datetime import datetime
 from PySide6.QtWidgets import QTextEdit

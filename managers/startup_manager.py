@@ -1,5 +1,7 @@
 # startup_manager.py
 
+"""Version 1.1"""
+
 import os
 import sys
 import pythoncom

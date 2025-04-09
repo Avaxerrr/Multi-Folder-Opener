@@ -1,5 +1,7 @@
 # folder_opening_manager.py
 
+"""Version 1.1"""
+
 from PySide6.QtCore import QTimer
 from core.folder_operations import FolderOpeningThread
 import logging

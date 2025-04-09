@@ -1,4 +1,6 @@
-# dialog_managers.py (new)
+# dialog_managers.py
+
+"""Version 1.1"""
 
 from PySide6.QtWidgets import QMessageBox, QDialog
 from ui.about_dialog import AboutDialog

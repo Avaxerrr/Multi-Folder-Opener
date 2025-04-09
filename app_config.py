@@ -1,5 +1,7 @@
 # app_config.py
 
+"""Version 1.1"""
+
 import os
 import sys
 
