@@ -1,4 +1,4 @@
-# Multi Folder Opener: Streamline Your Windows File Navigation
+# Streamline Your Windows File Navigation
 
 A powerful Windows productivity tool that opens multiple folders simultaneously in Windows Explorer tabs, saving time and eliminating repetitive navigation tasks. Version 1.1.0
 
