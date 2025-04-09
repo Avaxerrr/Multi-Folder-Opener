@@ -1,4 +1,4 @@
-# dialog_managers.py
+# dialog_managers.py (new)
 
 from PySide6.QtWidgets import QMessageBox, QDialog
 from ui.about_dialog import AboutDialog
@@ -52,15 +52,12 @@ class DialogManager:
         if not self.parent:
             return False
 
-        dialog = ConfiguratorDialog(self.parent)
+        dialog = ConfiguratorDialog(self.parent, callback=config_reload_callback)
         if self.icon:
             dialog.setWindowIcon(self.icon)
 
         result = dialog.exec()
-        if result == QDialog.Accepted and config_reload_callback:
-            config_reload_callback()
-            return True
-        return False
+        return result == QDialog.Accepted
 
     def open_configurator_and_exit(self, exit_callback=None):
         """Open configurator and exit application afterward"""

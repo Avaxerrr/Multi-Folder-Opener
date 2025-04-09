@@ -1,4 +1,4 @@
-# configurator.py
+# configurator.py (new)
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QShortcut, QKeySequence, QUndoStack
@@ -124,8 +124,9 @@ class ConfiguratorDialog(QDialog):
             system_tray=self.system_tray
         )
 
-        if self.callback:
-            self.callback()
+        if saved:
+            if self.callback:
+                self.callback()
         return saved
 
     # prevent the dialog from closing when pressing esc key

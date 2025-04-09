@@ -346,7 +346,7 @@ class ConfiguratorUI:
 
         # Close button (doesn't save)
         self.close_button = QPushButton("Close")
-        self.close_button.clicked.connect(self.dialog.reject)
+        self.close_button.clicked.connect(self.dialog.accept)
         footer_layout.addWidget(self.close_button)
 
         return footer_widget
