@@ -1,6 +1,8 @@
+Here's an updated README for the Multi Folder Opener, incorporating the version 1.1 mention and reflecting the latest features:
+
 # Multi Folder Opener
 
-A Windows utility that streamlines your workflow by opening multiple folders simultaneously in Windows Explorer tabs.
+A Windows utility that streamlines your workflow by opening multiple folders simultaneously in Windows Explorer tabs. Version 1.1.0
 
 | Configurator | Launcher |
 |---------|---------|
@@ -15,12 +17,15 @@ A Windows utility that streamlines your workflow by opening multiple folders sim
 - **Auto-Start Option**: Configure the application to start opening folders immediately upon launch
 - **Auto-Close Option**: Automatically close the launcher after folders are opened
 - **Theme Support**: Automatically adapts to Windows light/dark theme settings
+- **Keyboard Shortcuts**: Use Delete to remove folders, Ctrl+Z to undo actions and Ctrl+Y to redo
+- **Right-Click Context Menu**: Manage folders with a convenient context menu
+- **System Tray Integration**: Easy access from the system tray
 
 ## Installation
 
 1. Download the latest release from the [Releases](https://github.com/Avaxerrr/Multi-Folder-Opener/releases) page
 2. Extract the zip file to your preferred location
-3. Run `Multi Folder Opener.exe` to start the application
+3. Run `launcher.exe` to start the application
 
 No installation is required - the application is portable and can be run from any location.
 
@@ -31,12 +36,12 @@ No installation is required - the application is portable and can be run from an
 The Configurator allows you to set up your folder paths and application settings:
 
 1. Click "Add Folders" to select folders you want to open
-2. Arrange folders in the desired order using the Up/Down buttons
+2. Arrange folders in the desired order using the Up/Down buttons or drag-and-drop
 3. Adjust delay settings based on your system performance
 4. Toggle auto-start and auto-close options as needed
-5. Click "Save Configuration" to store your settings
+5. Click "Save" to store your settings
 
-You can edit folder paths directly by double-clicking on them in the list.
+You can edit folder paths directly by double-clicking on them in the list or using the right-click context menu.
 
 ### Launcher
 
@@ -55,3 +60,4 @@ This project is licensed under the MIT License - see the [LICENSE](license.md) f
 ## Acknowledgments
 
 - Launcher icon created by [3D Color](https://www.flaticon.com/authors/3d/color/) from [Flaticon](https://www.flaticon.com/)
+- Arrow icon created by [Creatype](https://www.flaticon.com/authors/creatype) from [Flaticon](https://www.flaticon.com/)
