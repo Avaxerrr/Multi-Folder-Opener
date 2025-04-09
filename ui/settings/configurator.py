@@ -67,7 +67,7 @@ class ConfiguratorDialog(QDialog):
         self.system_tray = self.ui.system_tray_checkbox.isChecked()
 
         # Check if shortcuts need to be created
-        needs_shortcuts = self.start_instantly or (self.auto_close and not self.system_tray)
+        needs_shortcuts = (self.start_instantly or self.auto_close) and not self.system_tray
 
         # Handle startup on boot setting
         start_on_boot = self.ui.start_on_boot_checkbox.isChecked()
