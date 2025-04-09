@@ -1,5 +1,3 @@
-# nuitka-project: --user-package-configuration-file={MAIN_DIRECTORY}/user.nuitka-package.config.yml
-
 # main_launcher.py
 
 import os

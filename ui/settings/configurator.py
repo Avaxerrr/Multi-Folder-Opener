@@ -91,7 +91,10 @@ class ConfiguratorDialog(QDialog):
                     self,
                     "Create Shortcuts",
                     "The selected options could make the configurator difficult to access.\n\n"
-                    "Would you like to create a desktop shortcut to ensure you can always access the configurator?",
+                    "Would you like to create shortcuts in the Start Menu Programs folder?\n"
+                    "This will create two shortcuts under 'Multi Folder Opener':\n"
+                    "- Multi Folder Opener (launcher)\n"
+                    "- Multi Folder Opener Configurator",
                     QMessageBox.Yes | QMessageBox.No,
                     QMessageBox.Yes
                 )

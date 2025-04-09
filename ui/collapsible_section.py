@@ -1,3 +1,6 @@
+# collapsible_section.py
+
+
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QApplication, QCheckBox, QDoubleSpinBox
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QEvent
 from PySide6.QtGui import QFont, QColor, QPalette

@@ -4,35 +4,44 @@ class UIResources:
     tooltips = {
         "explorer_startup": (
             "Time to wait after launching Windows Explorer before performing any actions.\n"
-            "Increase this value if Explorer is slow to start on your system."
+            "If folders aren't opening properly, try increasing this value.\n"
+            "Default: 1.2 seconds"
         ),
         "new_tab": (
-            "Time to wait after opening a new tab (Ctrl+T) before focusing the address bar.\n"
-            "Increase this value if Explorer is slow to respond to the new tab command."
+            "Time to wait after opening a new tab before the app tries to type in the address bar.\n"
+            "If you notice new tabs aren't being properly prepared, increase this value.\n"
+            "Default: 0.5 seconds"
         ),
         "address_bar_focus": (
-            "Time to wait after focusing the address bar (Ctrl+L) before typing the path.\n"
-            "Increase this value if Explorer is slow to focus the address bar."
+            "Time to wait after clicking the address bar before typing begins.\n"
+            "If you notice the folder path is being typed before the address bar is ready, increase this value.\n"
+            "Default: 0.5 seconds"
         ),
         "after_typing": (
-            "Time to wait after typing the folder path before pressing Enter.\n"
-            "Increase this value if Explorer is slow to process the typed path."
+            "Time to wait after the folder path is typed before pressing Enter.\n"
+            "If Explorer seems to cut off parts of your folder paths, increase this value.\n"
+            "Default: 0.5 seconds"
         ),
         "after_enter": (
-            "Time to wait after pressing Enter before proceeding to the next folder.\n"
-            "Increase this value if Explorer is slow to navigate to the folder."
+            "Time to wait after pressing Enter before moving to the next folder.\n"
+            "If some folders aren't opening completely before the next one starts, increase this value.\n"
+            "Default: 0.5 seconds"
         ),
         "start_instantly": (
-            "If checked, the folder opener will automatically open all folders when launched.\n"
-            "This is useful if you want to set up a shortcut to quickly open all your folders."
+            "When checked, folders will open automatically as soon as you launch the app.\n"
+            "Useful for creating a desktop shortcut that immediately opens all your folders with one click."
         ),
         "start_on_boot": (
-            "If checked, the folder opener will automatically start when Windows starts."
+            "When checked, the app will automatically start when you turn on your computer.\n"
+            "Helpful if you always need these folders open after starting your PC."
         ),
         "auto_close": (
-            "If checked, the executioner will automatically close after opening all folders."
+            "When checked, the app will automatically close after opening all your folders.\n"
+            "Useful to keep your taskbar clean after folders are opened."
         ),
         "auto_close_delay": (
-            "Delay in seconds before closing the executioner after completing folder opening."
+            "How long to wait before closing the app after all folders are opened.\n"
+            "Gives you time to see that everything opened correctly before the app disappears."
         )
     }
+

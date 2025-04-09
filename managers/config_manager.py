@@ -1,3 +1,5 @@
+# config_manager.py
+
 import os
 import json
 from PySide6.QtWidgets import QMessageBox
@@ -13,15 +15,15 @@ class ConfigManager:
         # Default values
         folders = []
         sleep_timers = {
-            "explorer_startup": 1.0,
-            "new_tab": 0.3,
-            "address_bar_focus": 0.3,
-            "after_typing": 0.3,
-            "after_enter": 0.2
+            "explorer_startup": 1.5,
+            "new_tab": 0.5,
+            "address_bar_focus": 0.5,
+            "after_typing": 0.5,
+            "after_enter": 0.5
         }
         start_instantly = False
         auto_close = False
-        auto_close_delay = 1.5
+        auto_close_delay = 3
         system_tray = False
 
         # Flag to indicate if this is first run or using default config
@@ -31,13 +33,12 @@ class ConfigManager:
         if not os.path.exists(self.config_path):
             default_config = {
                 "folders": [
-                    "C:\\Users\\Work\\Desktop",
-                    "Add you folder locations here...(Please delete this)"
+                    "Your folder will display here...(Please delete this)"
                 ],
                 "sleep_timers": sleep_timers,
                 "start_instantly": False,
                 "auto_close": False,
-                "auto_close_delay": 1.5,
+                "auto_close_delay": 3,
                 "system_tray": False
             }
 

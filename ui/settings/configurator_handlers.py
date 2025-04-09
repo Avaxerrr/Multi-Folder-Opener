@@ -1,3 +1,5 @@
+# configurator_handlers.py
+
 import os
 import subprocess
 from PySide6.QtWidgets import QMessageBox, QMenu, QFileDialog

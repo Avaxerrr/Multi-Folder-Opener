@@ -9,7 +9,7 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("About Multi Folder Opener")
-        self.setFixedSize(450, 540)  # Slightly increased height for better spacing
+        self.setFixedSize(450, 570)  # Slightly increased height for better spacing
 
         # Main layout with margins
         layout = QVBoxLayout()
@@ -33,10 +33,9 @@ class AboutDialog(QDialog):
 
         # Description
         description = (
-            "Multi Folder Opener is a Windows utility that streamlines your workflow by "
-            "opening multiple folders simultaneously in Windows Explorer tabs. "
-            "It uses automation to navigate Explorer and open each configured folder in a new tab, "
-            "saving you time and reducing repetitive tasks."
+            "Multi Folder Opener lets you open multiple folders in Windows Explorer tabs with one click. "
+            "It automates the process of opening each folder in a new tab, eliminating the need to "
+            "manually navigate to each location separately."
         )
         desc_label = QLabel(description)
         desc_label.setWordWrap(True)
@@ -50,11 +49,15 @@ class AboutDialog(QDialog):
         layout.addWidget(features_label)
 
         features = QLabel(
-            "• Opens multiple folders in Windows Explorer tabs with a single click\n"
-            "• Configurable delay settings to accommodate different system speeds\n"
-            "• Editable folder paths reordering\n"
-            "• Auto-start and auto-close options for automated workflows\n"
-            "• Supports both light and dark themes to match your Windows settings"
+            "• One-click opening of multiple folders in Explorer tabs\n"
+            "• Adjustable timing settings for different PC speeds\n"
+            "• Add, remove, edit, and reorder folder paths\n"
+            "• Right-click context menu for folder management\n"
+            "• Keyboard shortcuts (Delete to remove, Ctrl+Z to undo, Ctrl+Y to redo)\n"
+            "• Auto-start option when Windows boots\n"
+            "• Auto-close option after folders are opened\n"
+            "• System tray integration for easy access\n"
+            "• Light and dark theme support"
         )
         features.setWordWrap(True)
         layout.addWidget(features)

@@ -1,3 +1,5 @@
+# systemtray_mananger.py
+
 from PySide6.QtWidgets import QSystemTrayIcon, QMenu, QApplication, QInputDialog
 from PySide6.QtGui import QIcon, QAction
 import os
